@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="org.wlf.websocket"
+    package="org.websocket.demo"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 网络权限 -->
@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ChatClientActivity"
+            android:name="org.websocket.demo.ChatClientActivity"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

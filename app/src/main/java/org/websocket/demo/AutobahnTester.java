@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wlf.websocket;
+package org.websocket.demo;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 

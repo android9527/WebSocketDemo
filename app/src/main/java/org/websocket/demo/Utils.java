@@ -1,10 +1,6 @@
-package org.wlf.websocket;
+package org.websocket.demo;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +50,7 @@ public class Utils {
         return byteArray2Hex(m);
     }
 
-    static final String HEXES = "0123456789abcdef";
+    static final String HEXES = "0123456789ABCDEF";
 
     public static String byteArray2Hex(byte[] raw) {
         if (raw == null) {

@@ -1,4 +1,4 @@
-package org.wlf.websocket;
+package org.websocket.demo;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,9 +16,9 @@ import com.google.gson.Gson;
 import org.java_websocket.WebSocketImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.wlf.websocket.request.BindRequest;
-import org.wlf.websocket.request.HeartbeatRequest;
-import org.wlf.websocket.request.PushResponse;
+import org.websocket.demo.request.BindRequest;
+import org.websocket.demo.request.HeartbeatRequest;
+import org.websocket.demo.request.PushResponse;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -42,9 +42,7 @@ import okhttp3.ws.WebSocketListener;
 import okio.Buffer;
 
 /**
- * @author wlf(Andy)
  * @datetime 2016-02-16 09:28 GMT+8
- * @email 411086563@qq.com
  */
 public class ChatClientActivity extends AppCompatActivity implements OnClickListener {
     private Button btnConnect, btnHeartbeat, btnClear;
@@ -249,7 +247,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     private void parseMessage(String message) {
         try {
             JSONObject object = new JSONObject(message);
-            if (object == null || !object.has("pkg_type")) {
+            if (!object.has("pkg_type")) {
                 return;
             }
             String pkg_type = object.getString("pkg_type");
@@ -265,11 +263,9 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
             e.printStackTrace();
         }
 
-
         Message msg = handler.obtainMessage(MESSAGE_RECEIVE);
         msg.obj = message;
         handler.sendMessage(msg);
-
     }
 
     private void sendMessage(final String message) {

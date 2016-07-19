@@ -1,4 +1,4 @@
-package org.wlf.websocket.request;
+package org.websocket.demo.request;
 
 /**
  * Created by chenfeiyue on 16/7/18.

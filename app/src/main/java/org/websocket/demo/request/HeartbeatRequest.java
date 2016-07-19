@@ -1,8 +1,8 @@
-package org.wlf.websocket.request;
+package org.websocket.demo.request;
 
 import android.util.Log;
 
-import org.wlf.websocket.Utils;
+import org.websocket.demo.Utils;
 
 /**
  * Created by chenfeiyue on 16/7/18.

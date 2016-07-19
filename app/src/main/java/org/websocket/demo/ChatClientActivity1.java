@@ -1,4 +1,4 @@
-package org.wlf.websocket;
+package org.websocket.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +22,8 @@ import org.java_websocket.drafts.Draft_10;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.drafts.Draft_75;
 import org.java_websocket.drafts.Draft_76;
-import org.wlf.websocket.request.BindRequest;
+import org.wlf.websocket.R;
+import org.websocket.demo.request.BindRequest;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -46,9 +47,7 @@ import okhttp3.ws.WebSocketListener;
 import okio.Buffer;
 
 /**
- * @author wlf(Andy)
  * @datetime 2016-02-16 09:28 GMT+8
- * @email 411086563@qq.com
  */
 public class ChatClientActivity1 extends AppCompatActivity implements OnClickListener {
 

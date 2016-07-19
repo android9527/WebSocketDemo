@@ -1,10 +1,8 @@
-package org.wlf.websocket.request;
+package org.websocket.demo.request;
 
 import android.util.Log;
 
-import org.wlf.websocket.Utils;
-
-import java.util.Map;
+import org.websocket.demo.Utils;
 
 /**
  * Created by chenfeiyue on 16/7/18.
@@ -31,13 +29,13 @@ public class BindRequest extends BaseRequest {
 
     private static final String TAG = "BindRequest";
     private String pkg_type="04";
-    private String apptype = "602";
+    private String apptype = Constant.apptype;
     private String sign;
-    private String userid = "1217856";
-    private String deviceid = "352584060461735";
-    private String platform = "android";
-    private String platform_ver = android.os.Build.VERSION.RELEASE;
-    private String sdk = "pushcore";
+    private String userid = Constant.userid;
+    private String deviceid = Constant.deviceid;
+    private String platform = Constant.platform;
+    private String platform_ver = Constant.platform_ver;
+    private String sdk = Constant.sdk;
 
     public String getPkg_type() {
         return pkg_type;

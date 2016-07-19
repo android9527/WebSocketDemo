@@ -1,4 +1,4 @@
-package org.wlf.websocket;
+package org.websocket.demo;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
