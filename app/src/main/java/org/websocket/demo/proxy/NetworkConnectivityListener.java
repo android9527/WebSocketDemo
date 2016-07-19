@@ -90,11 +90,8 @@ public class NetworkConnectivityListener {
                     + noConnectivity) + " mState="
                     + mState.toString());
             LogUtil.d(TAG, "mState=" + mState.toString());
-            // Notifiy any handlers.
-            Iterator<Handler> it = mHandlers.keySet().iterator();
 
-            while (it.hasNext()) {
-                Handler target = it.next();
+            for (Handler target : mHandlers.keySet()) {
                 Message message = Message.obtain(target, mHandlers.get(target));
                 target.sendMessage(message);
                 LogUtil.d(TAG, "-------->sendMessage\n");

@@ -16,9 +16,11 @@ import com.google.gson.Gson;
 import org.java_websocket.WebSocketImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.request.PushResponse;
+import org.websocket.demo.scheduletask.ScheduleTaskService;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -96,7 +98,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
             SSLSocketFactory socketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(0, TimeUnit.MILLISECONDS)
+                    .connectTimeout(20 * 1000, TimeUnit.MILLISECONDS)
                     .readTimeout(0, TimeUnit.MILLISECONDS)
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
                     .sslSocketFactory(socketFactory)
@@ -198,6 +200,9 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_client);
+
+        ScheduleTaskService.getInstance().init(this.getApplicationContext());
+        ServiceProxy.getInstance(this.getApplicationContext()).startHeartBeat();
         init();
         svChat = (ScrollView) findViewById(R.id.svChat);
         btnConnect = (Button) findViewById(R.id.btnConnect);
@@ -306,6 +311,8 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     protected void onDestroy() {
         super.onDestroy();
         close();
+
+        ServiceProxy.getInstance(this.getApplicationContext()).stopHeartBeat();
     }
 
     private void onConnected() {

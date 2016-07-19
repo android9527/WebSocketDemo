@@ -18,6 +18,8 @@ public class Constant {
 
     public static final int DEFAULT_RESEND_COUNT = 3;
 
+    public static final int DEFAULT_HEARTBEAT_INTERVAL = 1000 * 10;
+
     /**
      * 请求成功
      */

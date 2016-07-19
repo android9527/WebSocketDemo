@@ -60,6 +60,7 @@ public class ScheduleTaskManager extends BroadcastReceiver implements
             Intent i = new Intent(SCHEDULE_TASK_ACTION);
             i.putExtra("id", id);
             alarm.mAlaramSender = PendingIntent.getBroadcast(mContext, id, i, 0);
+
             if (mAlarms.size() == 0)
             {
                 IntentFilter filter = new IntentFilter();

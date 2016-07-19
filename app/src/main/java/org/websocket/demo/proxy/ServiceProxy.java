@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class ServiceProxy implements ScheduleTask.Callback
-{
+public class ServiceProxy implements ScheduleTask.Callback {
     private TimeoutHandler timeoutHandler = new TimeoutHandler();
 
     private static final String TAG = "serviceProxy";
@@ -41,8 +40,7 @@ public class ServiceProxy implements ScheduleTask.Callback
      */
     private static Hashtable<Short, SocketRequest> reqQueue = new Hashtable<>();
 
-    private ServiceProxy(Context context)
-    {
+    private ServiceProxy(Context context) {
         mContext = context;
         initListener(mContext);
     }
@@ -57,10 +55,8 @@ public class ServiceProxy implements ScheduleTask.Callback
 
     private static ServiceProxy serviceProxy;
 
-    public static synchronized ServiceProxy getInstance(Context context)
-    {
-        if (serviceProxy == null)
-        {
+    public static synchronized ServiceProxy getInstance(Context context) {
+        if (serviceProxy == null) {
             serviceProxy = new ServiceProxy(context);
         }
         return serviceProxy;
@@ -71,39 +67,29 @@ public class ServiceProxy implements ScheduleTask.Callback
      *
      * @return 是否连接
      */
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
 //        return VtdService.getService().isConnected();
         // TODO
         return true;
     }
 
 
-    public void login()
-    {
+    public void login() {
     }
-
-
-
 
 
     /**
      * 类名称：ServiceHandler 作者： lining 类描述：监听网络连接回调Handler 修改时间：
-     *
      */
-    private final class ServiceHandler extends Handler
-    {
-        public ServiceHandler()
-        {
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler() {
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
-                LogUtil.d(TAG, "handleMessage");
+        public void handleMessage(Message msg) {
+            LogUtil.d(TAG, "handleMessage");
 
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case EVENT_NETWORK_STATE_CHANGED:
                     networkStateChanged();
                     break;
@@ -115,10 +101,8 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 方法名称：networkStateChanged 方法描述：网络状态改变时回被调用 输入参数： 返回类型：void： 备注：
      */
-    private void networkStateChanged()
-    {
-        if (mNetworkConnectivityListener == null)
-        {
+    private void networkStateChanged() {
+        if (mNetworkConnectivityListener == null) {
             LogUtil.d(TAG, "networkStateChanged: return");
 
             return;
@@ -129,32 +113,25 @@ public class ServiceProxy implements ScheduleTask.Callback
         // Notify the connection that network type has changed. Note that this
         // only work for connected connections, we need to reestablish if it's
         // suspended.
-        switch (state)
-        {
-            case CONNECTED:
-            {
-                try
-                {
-                    if (!isConnected())
-                    {
+        switch (state) {
+            case CONNECTED: {
+                try {
+                    if (!isConnected()) {
                         // TODO
 //                        connect();
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
             }
             case SUSPENDED:
-            case DISCONNECTED:
-            {
+            case DISCONNECTED: {
                 LogUtil.d(TAG, "DISCONNECTED");
 //                close();
-                
+
                 // ReconnectNotify(false);
-                    connectedNotify(false);
+                connectedNotify(false);
                 break;
             }
             default:
@@ -188,16 +165,13 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 发送无响应请求
      */
     public Http sendRequest(TcpMessage msg, boolean isNeedResponse,
-                            boolean isNeedResend)
-    {
-        if (!couldSend(msg.getMessageId()))
-        {
+                            boolean isNeedResend) {
+        if (!couldSend(msg.getMessageId())) {
             return null;
         }
 
         Http http = null;
-        try
-        {
+        try {
             RequestParam param = new RequestParam();
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
             param.setMessageId(msg.getMessageId());
@@ -206,9 +180,7 @@ public class ServiceProxy implements ScheduleTask.Callback
             request.setNeedRsp(isNeedResponse);
             request.setNeedResend(isNeedResend);
             http = Http.sendRequest(request);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             http = null;
         }
@@ -220,15 +192,12 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 发送分包的请求(指定sequence)
      */
     public Http sendMultiMsgRequest(TcpMessage tcpMessage, boolean isResponse,
-                                    boolean isNeedResend, short sequence)
-    {
-        if (!couldSend(tcpMessage.getMessageId()))
-        {
+                                    boolean isNeedResend, short sequence) {
+        if (!couldSend(tcpMessage.getMessageId())) {
             return null;
         }
         Http http = null;
-        try
-        {
+        try {
             RequestParam param = new RequestParam();
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
             param.setMessageId(tcpMessage.getMessageId());
@@ -238,9 +207,7 @@ public class ServiceProxy implements ScheduleTask.Callback
             request.setNeedResend(isNeedResend);
             request.setSequenceNumber(sequence);
             http = Http.sendRequest(request);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             http = null;
         }
@@ -253,15 +220,12 @@ public class ServiceProxy implements ScheduleTask.Callback
      *
      * @return sequenceId
      */
-    public short sendMultiMediaRequest(TcpMessage tcpMessage)
-    {
+    public short sendMultiMediaRequest(TcpMessage tcpMessage) {
         short sequenceId = -1;
-        if (!couldSend(tcpMessage.getMessageId()))
-        {
+        if (!couldSend(tcpMessage.getMessageId())) {
             return sequenceId;
         }
-        try
-        {
+        try {
             RequestParam param = new RequestParam();
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
             param.setMessageId(tcpMessage.getMessageId());
@@ -271,9 +235,7 @@ public class ServiceProxy implements ScheduleTask.Callback
             request.setNeedResend(true);
             sequenceId = request.getSequenceNumber();
             Http.sendRequest(request);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             sequenceId = -1;
         }
@@ -286,8 +248,7 @@ public class ServiceProxy implements ScheduleTask.Callback
      *
      * @return 登录标识
      */
-    private boolean couldSend(short msgId)
-    {
+    private boolean couldSend(short msgId) {
         return false;
 //        return Constant.isLogin || MessageId.AUTHEN == msgId
 //                || MessageId.REGIST == msgId;
@@ -296,17 +257,13 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 发送通用应答
      *
-     * @param answerId
-     *            对应的平台消息的ID
-     * @param sequenceId
-     *            对应的平台消息的流水号
-     * @param result
-     *            结果 CommonAnswerBody.SUCCESS, CommonAnswerBody.FAILED,
-     *            CommonAnswerBody.ERROR, CommonAnswerBody.UNSUPPORT
-     *            CommonAnswerBody.ALARM_CONFIRM
+     * @param answerId   对应的平台消息的ID
+     * @param sequenceId 对应的平台消息的流水号
+     * @param result     结果 CommonAnswerBody.SUCCESS, CommonAnswerBody.FAILED,
+     *                   CommonAnswerBody.ERROR, CommonAnswerBody.UNSUPPORT
+     *                   CommonAnswerBody.ALARM_CONFIRM
      */
-    public Http sendCommonAnswer(int answerId, int sequenceId, byte result)
-    {
+    public Http sendCommonAnswer(int answerId, int sequenceId, byte result) {
         TcpMessage msg = new TcpMessage();
 //        msg.setMessageId((short) MessageId.CLIENT_COMMON_ANSWER);
 //
@@ -325,13 +282,11 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 方法名称：processRsp 作者：lining 方法描述：处理响应消息 输入参数：@param socketMessage
      * 返回类型：void： 备注：
      */
-    private void processRsp(TcpMessage tcpMessage)
-    {
+    private void processRsp(TcpMessage tcpMessage) {
         LogUtil.d(TAG, "processRsp enter");
         Request request = (Request) getSocketRequest(tcpMessage.getAnswerSequenceId());
 
-        if (null == request)
-        {
+        if (null == request) {
             LogUtil.d(TAG, "processRsp request == null");
             return;
         }
@@ -345,10 +300,8 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 方法名称：getSocketRequest 作者：lining 方法描述：获取包含指定消息的请求 输入参数：@param
      * socketMessage 输入参数：@return 返回类型：SocketRequest： 备注：
      */
-    public SocketRequest getSocketRequest(short sequenceId)
-    {
-        if (isEmptyReqQueue() || 0 == sequenceId)
-        {
+    public SocketRequest getSocketRequest(short sequenceId) {
+        if (isEmptyReqQueue() || 0 == sequenceId) {
             return null;
         }
         return reqQueue.get(sequenceId);
@@ -357,18 +310,15 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 请求服务器返回消息响应
      */
-    public void doResponse(final TcpMessage msg)
-    {
-        if (msg == null)
-        {
+    public void doResponse(final TcpMessage msg) {
+        if (msg == null) {
             return;
         }
 
         // 消息体
         byte[] body = msg.getBody();
 
-        switch ((int) msg.getMessageId())
-        {
+        switch ((int) msg.getMessageId()) {
 //            case MessageId.SERVER_COMMON_ANSWER:
 //                commonAnswer(msg);
 //                break;
@@ -399,30 +349,24 @@ public class ServiceProxy implements ScheduleTask.Callback
         }
 
 
-
-
     }
 
     /**
      * 处理心跳和推送
      */
-    public void onPushMessage(TcpMessage msg)
-    {
-        if (msg == null)
-        {
+    public void onPushMessage(TcpMessage msg) {
+        if (msg == null) {
             LogUtil.d(TAG, "processPush return");
             return;
         }
 
-        switch ((int) msg.getMessageId())
-        {
+        switch ((int) msg.getMessageId()) {
             default:
                 break;
         }
     }
 
-    private void commonAnswer(TcpMessage msg)
-    {
+    private void commonAnswer(TcpMessage msg) {
 
 //        int result = TcpByteUtil.getByteValue(cab.getResult());
 //        switch (cab.getAnswerId())
@@ -452,8 +396,7 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 方法名称：startHeartBeat 方法描述：启动心跳 输入参数： 返回类型：void： 备注：
      */
-    public void startHeartBeat()
-    {
+    public void startHeartBeat() {
 //        if (!stop)
 //        {
 //            LogUtil.log(TAG, "heartBeat stop is false");
@@ -476,21 +419,18 @@ public class ServiceProxy implements ScheduleTask.Callback
 //        heartMsg.setPhoneNum(PhoneUtils.getInstance().getPhoneNum(this));
 //    }
 
-    private long getHeartBeatInterval()
-    {
-        return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT, 1000 * 60);
+    private long getHeartBeatInterval() {
+        return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT,
+                Constant.DEFAULT_HEARTBEAT_INTERVAL);
     }
-    public void stopHeartBeat()
-    {
-        try
-        {
+
+    public void stopHeartBeat() {
+        try {
             ScheduleTaskService.getInstance()
                     .getScheduleTaskManager()
                     .stopSchedule(this);
             LogUtil.d(TAG, "Start Stop HeartBeat...leave");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -498,8 +438,7 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 设置心跳时间间隔
      */
-    public void setHeartbeatInterval(long value)
-    {
+    public void setHeartbeatInterval(long value) {
         SPUtil.getInstance(mContext).save(Constant.SPKey.KEY_HEARTBEAT, value);
     }
 
@@ -507,11 +446,9 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 方法名称：sendHeartBeatRequest 作者：lining 方法描述：发送心跳请求 输入参数： 返回类型：void： 备注：
      */
-    public void sendHeartBeatRequest()
-    {
+    public void sendHeartBeatRequest() {
         LogUtil.d(TAG, "------->sendHeartBeatRequest");
-        try
-        {
+        try {
 //            // 构造心跳请求
 //            RequestParam param = new RequestParam();
 //            param.setMessageId(heartMsg.getMessageId());
@@ -521,9 +458,7 @@ public class ServiceProxy implements ScheduleTask.Callback
 //            request.setReconnect(false);
 //            // 发送心跳请求
 //            Http.sendRequest(request);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -531,53 +466,45 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 取消所以请求
      */
-    public void cancelAllRequest()
-    {
-        if (this.isEmptyReqQueue())
-        {
+    public void cancelAllRequest() {
+        if (this.isEmptyReqQueue()) {
             LogUtil.d(TAG, "cancelAllRequest return");
             return;
         }
         Enumeration<SocketRequest> elements = reqQueue.elements();
-        for (Enumeration<SocketRequest> element = elements; elements.hasMoreElements();)
-        {
+        for (Enumeration<SocketRequest> element = elements; elements.hasMoreElements(); ) {
             Request request = (Request) element.nextElement();
 
-            if (null != request)
-            {
+            if (null != request) {
                 Http http = request.getHttp();
 
-                if (http != null)
-                {
+                if (http != null) {
                     http.cancel();
                 }
             }
         }
         delAllSocketRequest();
     }
+
     /**
      * 方法名称：delAllSocketRequest 作者：lining 方法描述：删除所有请求 输入参数: 返回类型：void 备注：
      */
-    private void delAllSocketRequest()
-    {
-        if (isEmptyReqQueue())
-        {
+    private void delAllSocketRequest() {
+        if (isEmptyReqQueue()) {
             return;
         }
 
         reqQueue.clear();
     }
 
-    private boolean isEmptyReqQueue()
-    {
+    private boolean isEmptyReqQueue() {
         return null == reqQueue || reqQueue.isEmpty();
     }
 
     /**
      * 方法名称：stopService 方法描述：停止服务 输入参数： 返回类型：void： 备注：
      */
-    public void stopService()
-    {
+    public void stopService() {
         clearAll();
 //        VtdService.getService().stopService();
     }
@@ -585,16 +512,14 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 方法名称：clearAll 作者：lining 方法描述：清除内存数据 输入参数: 返回类型：void 备注：
      */
-    private void clearAll()
-    {
+    private void clearAll() {
         // 清除缓存数据
 
         cancelAllRequest();
         ScheduleTaskService.getInstance().shutdown();
 //        stopHeartBeat();
 
-        if (null != mNetworkConnectivityListener)
-        {
+        if (null != mNetworkConnectivityListener) {
             LogUtil.d(TAG, "unregisterHandler");
             mNetworkConnectivityListener.unregisterHandler(mServiceHandler);
             mNetworkConnectivityListener.stopListening();
@@ -614,7 +539,7 @@ public class ServiceProxy implements ScheduleTask.Callback
 //        }
 
 
-        if(!isConnected()){
+        if (!isConnected()) {
             return 0;
         }
 
@@ -627,10 +552,8 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 方法名称：delSocketRequest 作者：lining 方法描述：从请求队列中删除一个请求 输入参数:@param
      * socketRequest 返回类型：void 备注：
      */
-    public void delSocketRequest(SocketRequest socketRequest)
-    {
-        if (null == socketRequest)
-        {
+    public void delSocketRequest(SocketRequest socketRequest) {
+        if (null == socketRequest) {
             return;
         }
         delSocketRequest(socketRequest.getSequenceNumber());
@@ -640,10 +563,8 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 方法名称：delSocketRequest 作者：lining 方法描述：删除一个流水号的请求 输入参数：@param
      * sequenceNumber 返回类型：void： 备注：
      */
-    private void delSocketRequest(short sequenceNumber)
-    {
-        if (isEmptyReqQueue() || sequenceNumber < 0)
-        {
+    private void delSocketRequest(short sequenceNumber) {
+        if (isEmptyReqQueue() || sequenceNumber < 0) {
             return;
         }
         reqQueue.remove(sequenceNumber);
@@ -653,27 +574,21 @@ public class ServiceProxy implements ScheduleTask.Callback
     /**
      * 方法名称：send 作者：lining 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
-    public boolean send(SocketRequest socketRequest)
-    {
+    public boolean send(SocketRequest socketRequest) {
         boolean result = false;
 
-        if (!isConnected())
-        {
+        if (!isConnected()) {
             return result;
         }
-        try
-        {
+        try {
             sendMessage(socketRequest);
 
-            if (socketRequest.isNeedRsp())
-            {
+            if (socketRequest.isNeedRsp()) {
                 addSocketRequest(socketRequest);
                 result = true;
             }
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         socketRequest = null;
@@ -684,22 +599,19 @@ public class ServiceProxy implements ScheduleTask.Callback
      * 方法名称：addSocketRequest 作者：lining 方法描述：加入请求到队列中 输入参数：@param socketRequest
      * 返回类型：void： 备注：
      */
-    private void addSocketRequest(SocketRequest socketRequest)
-    {
-        if (null == socketRequest || null == reqQueue)
-        {
+    private void addSocketRequest(SocketRequest socketRequest) {
+        if (null == socketRequest || null == reqQueue) {
             return;
         }
         reqQueue.put(socketRequest.getSequenceNumber(), socketRequest);
     }
+
     /**
      * 方法名称：sendMessage 作者：lining 方法描述：发送消息 输入参数：@param message 输入参数：@throws
      * IOException 返回类型：void： 备注：
      */
-    private void sendMessage(SocketRequest request) throws IOException
-    {
-        if (null == request)
-        {
+    private void sendMessage(SocketRequest request) throws IOException {
+        if (null == request) {
             throw new IOException();
         }
 
