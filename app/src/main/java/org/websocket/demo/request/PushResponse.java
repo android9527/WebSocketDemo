@@ -3,7 +3,7 @@ package org.websocket.demo.request;
 import android.os.SystemClock;
 import android.util.Log;
 
-import org.websocket.demo.Utils;
+import org.websocket.demo.util.Utils;
 
 /**
  * Created by chenfeiyue on 16/7/18.

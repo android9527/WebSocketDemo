@@ -5,7 +5,7 @@ import java.util.HashMap;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 
-import org.websocket.demo.LogUtil;
+import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.VtdService;
 import org.websocket.demo.request.Constant;
 

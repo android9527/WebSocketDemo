@@ -9,6 +9,7 @@ import org.websocket.demo.proxy.Http;
 import org.websocket.demo.proxy.Request;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.SocketRequest;
+import org.websocket.demo.util.LogUtil;
 
 
 /**

@@ -1,4 +1,4 @@
-package org.websocket.demo;
+package org.websocket.demo.util;
 
 import java.security.MessageDigest;
 import java.util.List;

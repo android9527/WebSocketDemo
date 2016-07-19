@@ -13,7 +13,7 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 
-import org.websocket.demo.LogUtil;
+import org.websocket.demo.util.LogUtil;
 
 /**
  * A wrapper for a broadcast receiver that provides network connectivity state

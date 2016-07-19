@@ -5,8 +5,8 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 
-import org.websocket.demo.LogUtil;
-import org.websocket.demo.SPUtil;
+import org.websocket.demo.util.LogUtil;
+import org.websocket.demo.util.SPUtil;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;

@@ -12,7 +12,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.SparseArray;
 
-import org.websocket.demo.LogUtil;
+import org.websocket.demo.util.LogUtil;
 
 public class ScheduleTaskManager extends BroadcastReceiver implements
         ScheduleTask

@@ -5,8 +5,8 @@ import java.util.concurrent.Executors;
 
 import android.util.Log;
 
-import org.websocket.demo.LogUtil;
-import org.websocket.demo.SPUtil;
+import org.websocket.demo.util.LogUtil;
+import org.websocket.demo.util.SPUtil;
 import org.websocket.demo.VtdService;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
