@@ -7,7 +7,7 @@ import android.util.Log;
 
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
-import org.websocket.demo.VtdService;
+import org.websocket.demo.WebSocketService;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
@@ -31,7 +31,7 @@ public class Http implements Runnable {
     /**
      * HeartBeatService引用
      */
-    private static VtdService mService;
+    private static WebSocketService mService;
 
     /**
      * 线程池
@@ -42,7 +42,7 @@ public class Http implements Runnable {
     /**
      * 设置HeartBeatService引用
      */
-    public static void setMService(VtdService service) {
+    public static void setMService(WebSocketService service) {
         mService = service;
     }
 

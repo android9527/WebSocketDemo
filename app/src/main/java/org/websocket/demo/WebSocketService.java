@@ -16,7 +16,7 @@ import org.websocket.demo.util.LogUtil;
  * 类名称：VtdService 类描述：通讯服务服务 修改时间：
  *
  */
-public class VtdService extends Service
+public class WebSocketService extends Service
 {
 
     static final String TAG = "VtdService";
@@ -27,11 +27,11 @@ public class VtdService extends Service
     private ServiceBinder mBinder = new ServiceBinder();
 
 
-    private static VtdService instance = null;
+    private static WebSocketService instance = null;
 
     private ServiceProxy serviceProxy;
 
-    public static VtdService getService()
+    public static WebSocketService getService()
     {
         return instance;
     }

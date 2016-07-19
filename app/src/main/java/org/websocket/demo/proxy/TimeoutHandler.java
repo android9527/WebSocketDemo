@@ -6,7 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 
 import org.websocket.demo.util.LogUtil;
-import org.websocket.demo.VtdService;
+import org.websocket.demo.WebSocketService;
 import org.websocket.demo.request.Constant;
 
 public class TimeoutHandler implements ITimerHandler {
@@ -17,7 +17,7 @@ public class TimeoutHandler implements ITimerHandler {
     public void timeoutHandle(short sequenceNumber, int status) {
 
 
-        SocketRequest socketRequest = VtdService.getService()
+        SocketRequest socketRequest = WebSocketService.getService()
                 .getSocketRequest(sequenceNumber);
 
         if (null == socketRequest) {
@@ -49,7 +49,7 @@ public class TimeoutHandler implements ITimerHandler {
                 intent.putExtra(Constant.SERVICE_RESPONSE_RESULT, status);
                 intent.putExtra(Constant.MESSAGE_BODY, request.getTcpMessage()
                         .getBody());
-                VtdService.getService().sendBroadcast(intent);
+                WebSocketService.getService().sendBroadcast(intent);
             }
             LogUtil.d("TimeoutHandler",
                     "requestID = " + param.getMessageId() + ",action="
