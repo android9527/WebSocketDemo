@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.websocket.demo;
+package org.websocket.demo.proxy;
 
 import java.io.EOFException;
 import java.io.IOException;

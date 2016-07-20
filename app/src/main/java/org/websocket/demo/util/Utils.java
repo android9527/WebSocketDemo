@@ -50,7 +50,7 @@ public class Utils {
         return byteArray2Hex(m);
     }
 
-    static final String HEXES = "0123456789ABCDEF";
+    static final String HEXES = "0123456789abcdef";
 
     public static String byteArray2Hex(byte[] raw) {
         if (raw == null) {

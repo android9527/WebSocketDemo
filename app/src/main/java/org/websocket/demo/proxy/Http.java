@@ -155,7 +155,7 @@ public class Http implements Runnable {
         public long doSchedule() {
 
             int timeout = currentRequest.getParam().getTimeout();
-            currentRequest.addsendNum();
+            currentRequest.addSendNum();
             // 重发超过限定次数，不再保存请求对象
             if (currentRequest.getSendNum() >
                     SPUtil.getInstance(mService).getInt(Constant.SPKey.KEY_RESEND_COUNT, Constant.DEFAULT_RESEND_COUNT)) {

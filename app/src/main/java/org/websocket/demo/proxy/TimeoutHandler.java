@@ -16,7 +16,6 @@ public class TimeoutHandler implements ITimerHandler {
     @Override
     public void timeoutHandle(short sequenceNumber, int status) {
 
-
         SocketRequest socketRequest = WebSocketService.getService()
                 .getSocketRequest(sequenceNumber);
 

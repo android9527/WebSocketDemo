@@ -22,6 +22,7 @@ import org.java_websocket.drafts.Draft_10;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.drafts.Draft_75;
 import org.java_websocket.drafts.Draft_76;
+import org.websocket.demo.proxy.HttpLoggingInterceptor;
 import org.websocket.demo.request.BindRequest;
 
 import java.io.IOException;

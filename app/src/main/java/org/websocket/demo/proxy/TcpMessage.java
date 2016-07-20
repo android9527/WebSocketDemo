@@ -4,11 +4,6 @@ public class TcpMessage
 {
 
     /**
-     * 标志位
-     */
-    public static final byte MESSAGE_TAG = 0x7e;
-
-    /**
      * 消息id
      */
     private short messageId = 0;
@@ -19,19 +14,9 @@ public class TcpMessage
     private boolean isMultiMessage = false;
 
     /**
-     * 消息体属性,是否加密
-     */
-    private boolean isCrypt = false;
-
-    /**
      * 消息体属性,消息体长度
      */
     private short bodyLength = 0;
-
-    /**
-     * 终端手机号
-     */
-    private String phoneNum = "";
 
     /**
      * 消息流水号
@@ -42,16 +27,6 @@ public class TcpMessage
      * 应答流水号(只有当消息为响应消息的时候才会有)
      */
     private short answerSequenceId = -1;
-
-    /**
-     * 消息包封装项内容,消息包总数
-     */
-    private short packageCount = 0;
-
-    /**
-     * 消息包封装项内容，包序号
-     */
-    private short packageNum = 1;
 
     private byte[] body = new byte[0];
 
@@ -73,16 +48,6 @@ public class TcpMessage
     public void setMultiMessage(boolean isMultiMessage)
     {
         this.isMultiMessage = isMultiMessage;
-    }
-
-    public boolean isCrypt()
-    {
-        return isCrypt;
-    }
-
-    public void setCrypt(boolean isCrypt)
-    {
-        this.isCrypt = isCrypt;
     }
 
     public int getBodyLength()
@@ -119,26 +84,6 @@ public class TcpMessage
     public void setAnswerSequenceId(short answerSequenceId)
     {
         this.answerSequenceId = answerSequenceId;
-    }
-
-    public short getPackageCount()
-    {
-        return packageCount;
-    }
-
-    public void setPackageCount(short packageCount)
-    {
-        this.packageCount = packageCount;
-    }
-
-    public short getPackageNum()
-    {
-        return packageNum;
-    }
-
-    public void setPackageNum(short packageNum)
-    {
-        this.packageNum = packageNum;
     }
 
     public byte[] getBody()

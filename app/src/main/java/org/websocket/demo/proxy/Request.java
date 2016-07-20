@@ -97,7 +97,7 @@ public final class Request extends SocketRequest {
         this.sendNum = sendNum;
     }
 
-    public void addsendNum() {
+    public void addSendNum() {
         this.sendNum++;
     }
 
@@ -122,8 +122,5 @@ public final class Request extends SocketRequest {
      */
     public static String getConnectType() {
         return TYPE_TCP;
-        //		return EspaceApp.getIns().getSharedPreferences(Resource.CFG_NAME,
-        //				Context.MODE_PRIVATE).getString(Resource.CFG_PORT, "").equals(
-        //				"7801") ? TYPE_TCP : TYPE_HTTP;
     }
 }
