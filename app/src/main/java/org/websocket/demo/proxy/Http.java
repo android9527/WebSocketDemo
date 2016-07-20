@@ -1,16 +1,14 @@
 package org.websocket.demo.proxy;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import android.util.Log;
 
-import org.websocket.demo.util.LogUtil;
-import org.websocket.demo.util.SPUtil;
+import org.websocket.demo.AsyncTaskExecutors;
 import org.websocket.demo.WebSocketService;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
+import org.websocket.demo.util.LogUtil;
+import org.websocket.demo.util.SPUtil;
 
 /**
  * HTTP连接工具类 修改时间：
@@ -36,8 +34,8 @@ public class Http implements Runnable {
     /**
      * 线程池
      */
-    private static final ExecutorService sExecutor = Executors
-            .newFixedThreadPool(10);
+//    private static final ExecutorService sExecutor = Executors
+//            .newFixedThreadPool(10);
 
     /**
      * 设置HeartBeatService引用
@@ -113,7 +111,7 @@ public class Http implements Runnable {
             // Thread t = new Thread(http, "sendRequest thread");
             // t.start();
 
-            sExecutor.execute(http);
+            AsyncTaskExecutors.executeTask(http);
         }
 
         return http;
