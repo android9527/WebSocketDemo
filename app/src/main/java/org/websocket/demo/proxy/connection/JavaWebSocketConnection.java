@@ -1,14 +1,16 @@
 package org.websocket.demo.proxy.connection;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
-import org.websocket.demo.proxy.ImpsConnection;
+import org.websocket.demo.proxy.OkHttp3Creator;
+import org.websocket.demo.request.Constant;
+import org.websocket.demo.util.LogUtil;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,61 +18,86 @@ import java.util.Map;
  * Created by chenfeiyue on 16/7/21.
  * JavaWebSocketConnection
  */
-public class JavaWebSocketConnection implements IConnection {
-    private WebSocketClient client;
-    private ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
+public class JavaWebSocketConnection extends BaseConnection {
 
-    @Override
-    public void disConnect() {
-        if (client != null) {
-            client.close();
+    private static final String TAG = "JavaWebSocketConnection";
+    private WebSocketClient socket;
+
+    private static JavaWebSocketConnection instance;
+
+    public JavaWebSocketConnection(Context context) {
+        super(context);
+    }
+
+    public static JavaWebSocketConnection instance(Context context) {
+        if (instance == null) {
+            synchronized (JavaWebSocketConnection.class) {
+                if (instance == null) {
+                    instance = new JavaWebSocketConnection(context);
+                }
+            }
         }
+        return instance;
     }
 
     @Override
     public void sendMessage(String message) {
-
+        // TODO
     }
 
     @Override
-    public void addImpsConnection(ImpsConnection impsConnection) {
-        if (!impsConnections.contains(impsConnection)) {
-            impsConnections.add(impsConnection);
-        }
-    }
-
     public void connect(String url) {
+        if (connecting) {
+            LogUtil.w(TAG, "TCP is connecting return !");
+            return;
+        }
         try {
             Map<String, String> httpHeaders = new HashMap<>();
             httpHeaders.put("Origin", url);
-            client = new WebSocketClient(new URI(url), new Draft_17(), httpHeaders, 20000) {
+            socket = new WebSocketClient(new URI(url), new Draft_17(), httpHeaders, Constant.DEFAULT_CONNECT_TIMEOUT) {
                 @Override
                 public void onOpen(final ServerHandshake serverHandshakeData) {
-
+                    connecting = false;
                     Log.e("wlf", "已经连接到服务器【" + getURI() + "】");
+                    notifyListener(true);
                 }
 
                 @Override
                 public void onMessage(final String message) {
-
+                    connecting = false;
                     Log.e("wlf", "获取到服务器信息【" + message + "】");
+                    if (message != null) {
+                        System.out.println("onMessage " + message);
+                        notifyGetMessage(message);
+                    }
                 }
 
                 @Override
                 public void onClose(final int code, final String reason, final boolean remote) {
-
+                    connecting = false;
                     Log.e("wlf", "断开服务器连接【" + getURI() + "，状态码： " + code + "，断开原因：" + reason + "】" + remote);
+                    notifyListener(false);
                 }
 
                 @Override
                 public void onError(final Exception e) {
-
                     Log.e("wlf", "连接发生了异常【异常原因：" + e + "】");
+                    connecting = false;
+                    notifyListener(false);
                 }
             };
-            client.connect();
+            socket.connect();
+            connecting = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public synchronized void close() {
+        if (socket == null) {
+            return;
+        }
+        socket.close(1000, "closed by client");
     }
 }

@@ -3,6 +3,8 @@ package org.websocket.demo.proxy;
 
 import android.content.Context;
 
+import org.websocket.demo.request.Constant;
+
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
@@ -72,8 +74,8 @@ public class OkHttp3Creator {
             SSLSocketFactory socketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(90 * 1000, TimeUnit.MILLISECONDS)
-                    .readTimeout(10 * 60 * 1000, TimeUnit.MILLISECONDS)
+                    .connectTimeout(Constant.DEFAULT_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .readTimeout(0, TimeUnit.MILLISECONDS)
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
                     .sslSocketFactory(socketFactory)
                     .hostnameVerifier(HOSTNAME_VERIFIER);

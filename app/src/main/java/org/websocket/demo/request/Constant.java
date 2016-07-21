@@ -8,7 +8,6 @@ public class Constant {
     public static short messageId = 1;
 
     public static String userid = "1217856";
-    public static String deviceid = "352584060461735";
     public static String platform = "android";
     public static String platform_ver = android.os.Build.VERSION.RELEASE;
     public static String sdk = "pushcore";
@@ -22,7 +21,12 @@ public class Constant {
     public static String secret_key = "123456";
 
     /**
-     * 超时时间
+     * 连接超时时间
+     */
+    public static final int DEFAULT_CONNECT_TIMEOUT = 30 * 1000;
+
+    /**
+     * 消息读取超时时间
      */
     public static final int DEFAULT_TIMEOUT = 30 * 1000;
 

@@ -21,6 +21,7 @@ import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
+import org.websocket.demo.util.DeviceUtil;
 
 /**
  * @datetime 2016-02-16 09:28 GMT+8
@@ -109,6 +110,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
             case R.id.btnBind:
                 BindRequest request = new BindRequest();
+                request.setDeviceid(DeviceUtil.getUniqueId(ChatClientActivity.this));
                 request.setSign(request.getSign());
                 sendMessage(gson.toJson(request));
                 break;

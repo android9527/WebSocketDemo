@@ -8,6 +8,7 @@ import org.websocket.demo.util.Utils;
 
 /**
  * Created by chenfeiyue on 16/7/18.
+ * BindRequest
  */
 public class BindRequest extends BaseRequest {
 
@@ -34,7 +35,7 @@ public class BindRequest extends BaseRequest {
     private String apptype = Constant.apptype;
     private String sign;
     private String userid = Constant.userid;
-    private String deviceid = Constant.deviceid;
+    private String deviceid = "";
     private String platform = Constant.platform;
     private String platform_ver = Constant.platform_ver;
     private String sdk = Constant.sdk;

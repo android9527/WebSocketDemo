@@ -3,18 +3,13 @@ package org.websocket.demo.proxy.connection;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import org.websocket.demo.AsyncTaskExecutors;
-import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.OkHttp3Creator;
 import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.proxy.TcpMessageParser;
-import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -28,25 +23,19 @@ import okio.Buffer;
  * Created by chenfeiyue on 16/7/20.
  * OkHttpWebSocketConnection
  */
-public class OkHttpWebSocketConnection implements IConnection {
+public class OkHttpWebSocketConnection extends BaseConnection {
 
     private static final String TAG = "WebSocketConnection";
-    private final Gson gson = new Gson();
-        private static OkHttpWebSocketConnection instance;
-    private Context mContext;
-
-    private boolean connecting = false;
-
-    private ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
+    private static OkHttpWebSocketConnection instance;
+    private okhttp3.ws.WebSocket socket;
 
     public OkHttpWebSocketConnection(Context context) {
-        this.mContext = context.getApplicationContext();
-        ScheduleTaskService.getInstance().init(mContext.getApplicationContext());
+        super(context);
     }
 
     public static OkHttpWebSocketConnection instance(Context context) {
         if (instance == null) {
-            synchronized (OkHttp3Creator.class) {
+            synchronized (OkHttpWebSocketConnection.class) {
                 if (instance == null) {
                     instance = new OkHttpWebSocketConnection(context);
                 }
@@ -54,15 +43,6 @@ public class OkHttpWebSocketConnection implements IConnection {
         }
         return instance;
     }
-
-    @Override
-    public void addImpsConnection(ImpsConnection impsConnection) {
-        if (!impsConnections.contains(impsConnection)) {
-            impsConnections.add(impsConnection);
-        }
-    }
-
-    private okhttp3.ws.WebSocket socket;
 
     private WebSocketListener webSocketListener = new WebSocketListener() {
         @Override
@@ -99,7 +79,7 @@ public class OkHttpWebSocketConnection implements IConnection {
 
         @Override
         public void onPong(Buffer payload) {
-
+            connecting = false;
         }
 
         @Override
@@ -126,11 +106,7 @@ public class OkHttpWebSocketConnection implements IConnection {
     }
 
     @Override
-    public void disConnect() {
-        close();
-    }
-
-    private synchronized void close() {
+    public synchronized void close() {
         if (socket == null) {
             return;
         }
@@ -144,7 +120,7 @@ public class OkHttpWebSocketConnection implements IConnection {
     @Override
     public void sendMessage(final String message) {
 
-        Log.e("ChatClientActivity", "send To Server" + message);
+        Log.e("ChatClientActivity", "send To Server " + message);
 
         if (socket == null || message == null) {
             return;
@@ -175,34 +151,4 @@ public class OkHttpWebSocketConnection implements IConnection {
         return msg;
     }
 
-    private void notifyListener(boolean isConnected) {
-        if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-                if (null == impsConnection)
-                    continue;
-                impsConnection.connectedNotify(isConnected);
-            }
-        }
-    }
-
-    private void notifyGetMessage(String response) {
-        if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-//                            impsConnection.receiveMsg(getMessage(response));
-                if (null == impsConnection)
-                    continue;
-                impsConnection.receiveMsg(response);
-            }
-        }
-    }
-
-    private void notifySendMessage(String message) {
-        if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-                if (null == impsConnection)
-                    continue;
-                impsConnection.sendedMessage(message);
-            }
-        }
-    }
 }

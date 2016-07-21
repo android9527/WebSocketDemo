@@ -1,17 +1,14 @@
 package org.websocket.demo.proxy.connection;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import android.content.Context;
 import android.util.Log;
 
-import org.websocket.demo.proxy.ImpsConnection;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.util.Arrays;
 
-public class UdpConnection implements IConnection{
+public class UdpConnection extends BaseConnection {
     private static final String TAG = "UdpConnection";
 
     private static final int MAX_LENGTH = 1024;
@@ -24,25 +21,22 @@ public class UdpConnection implements IConnection{
 
     private boolean isRun = false;
 
-    private static UdpConnection conn;
-
-    private ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
-
-    @Override
-    public void addImpsConnection(ImpsConnection impsConnection) {
-        if (!impsConnections.contains(impsConnection)) {
-            impsConnections.add(impsConnection);
-        }
-    }
+    private static UdpConnection instance;
 
     public static UdpConnection getInstance(Context context) {
-        if (conn == null) {
-            conn = new UdpConnection(context);
+
+        if (instance == null) {
+            synchronized (UdpConnection.class) {
+                if (instance == null) {
+                    instance = new UdpConnection(context);
+                }
+            }
         }
-        return conn;
+        return instance;
     }
 
     private UdpConnection(Context context) {
+        super(context);
     }
 
     @Override
@@ -60,7 +54,7 @@ public class UdpConnection implements IConnection{
     }
 
     @Override
-    public void disConnect() {
+    protected synchronized void close() {
         isRun = false;
         receiveSocket.disconnect();
         receiveSocket.close();
@@ -109,36 +103,4 @@ public class UdpConnection implements IConnection{
         }
     }
 
-
-    private void notifyListener(boolean isConnected) {
-        if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-                if (null == impsConnection)
-                    continue;
-                impsConnection.connectedNotify(isConnected);
-            }
-        }
-    }
-
-    private void notifyGetMessage(String response) {
-        if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-//                            impsConnection.receiveMsg(getMessage(response));
-                if (null == impsConnection)
-                    continue;
-                impsConnection.receiveMsg(response);
-            }
-        }
-    }
-
-    private void notifySendMessage(String message) {
-        if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-//                            impsConnection.receiveMsg(getMessage(response));
-                if (null == impsConnection)
-                    continue;
-                impsConnection.sendedMessage(message);
-            }
-        }
-    }
 }

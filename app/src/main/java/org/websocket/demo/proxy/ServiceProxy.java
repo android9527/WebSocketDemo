@@ -13,6 +13,7 @@ import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
 import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.request.PushResponse;
+import org.websocket.demo.util.DeviceUtil;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
 import org.websocket.demo.request.Constant;
@@ -53,7 +54,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
     private static Hashtable<Short, SocketRequest> reqQueue = new Hashtable<>();
 
     private ServiceProxy(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         initListener(mContext);
     }
 
@@ -191,6 +192,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
 
     private void startBindClient(){
         BindRequest request = new BindRequest();
+        request.setDeviceid(DeviceUtil.getUniqueId(mContext));
         request.setSign(request.getSign());
         sendMessage(gson.toJson(request));
     }

@@ -3,6 +3,7 @@ package org.websocket.demo.request;
 import android.util.Log;
 
 import org.websocket.demo.proxy.MessageId;
+import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.Utils;
 
 /**
@@ -52,9 +53,9 @@ public class HeartbeatRequest extends BaseRequest {
                 + "pkg_type=" + pkg_type
                 + Constant.secret_key;
 
-        Log.e("HeartbeatRequest", " before signature " + signature);
+        LogUtil.d("HeartbeatRequest", "before signature " + signature);
         sign = Utils.toMd5(signature);
-        Log.e("HeartbeatRequest", "after signature " + sign);
+        LogUtil.d("HeartbeatRequest", "after signature " + sign);
 
         return sign;
     }

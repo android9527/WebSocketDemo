@@ -24,6 +24,7 @@ import org.java_websocket.drafts.Draft_75;
 import org.java_websocket.drafts.Draft_76;
 import org.websocket.demo.proxy.HttpLoggingInterceptor;
 import org.websocket.demo.request.BindRequest;
+import org.websocket.demo.util.DeviceUtil;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -391,8 +392,8 @@ public class ChatClientActivity1 extends AppCompatActivity implements OnClickLis
             case R.id.btnBind:
 
                 BindRequest request = new BindRequest();
+                request.setDeviceid(DeviceUtil.getUniqueId(ChatClientActivity1.this));
                 request.setSign(request.getSign());
-
                 sendMessage(gson.toJson(request));
                 break;
         }
@@ -400,7 +401,7 @@ public class ChatClientActivity1 extends AppCompatActivity implements OnClickLis
 
     private void sendMessage(final String message) {
 
-        Log.e("ChatClientActivity", "send To Server" + message);
+        Log.e("ChatClientActivity", "send To Server " + message);
 
         if (socket != null && message != null) {
 
