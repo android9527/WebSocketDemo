@@ -5,14 +5,11 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.websocket.demo.AsyncTaskExecutors;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.OkHttp3Creator;
 import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.proxy.TcpMessageParser;
-import org.websocket.demo.request.PushResponse;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
 
@@ -29,35 +26,36 @@ import okio.Buffer;
 
 /**
  * Created by chenfeiyue on 16/7/20.
- * WebSocketClient
+ * OkHttpWebSocketConnection
  */
-public class WebSocketConnection implements IConnection {
+public class OkHttpWebSocketConnection implements IConnection {
 
     private static final String TAG = "WebSocketConnection";
     private final Gson gson = new Gson();
-    //    private static WebSocketClient instance;
+        private static OkHttpWebSocketConnection instance;
     private Context mContext;
 
     private boolean connecting = false;
 
-    public WebSocketConnection(Context context) {
-        this.mContext = context;
+    private ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
+
+    public OkHttpWebSocketConnection(Context context) {
+        this.mContext = context.getApplicationContext();
         ScheduleTaskService.getInstance().init(mContext.getApplicationContext());
     }
 
-//    public static WebSocketClient instance(Context context) {
-//        if (instance == null) {
-//            synchronized (OkHttp3Creator.class) {
-//                if (instance == null) {
-//                    instance = new WebSocketClient(context);
-//                }
-//            }
-//        }
-//        return instance;
-//    }
+    public static OkHttpWebSocketConnection instance(Context context) {
+        if (instance == null) {
+            synchronized (OkHttp3Creator.class) {
+                if (instance == null) {
+                    instance = new OkHttpWebSocketConnection(context);
+                }
+            }
+        }
+        return instance;
+    }
 
-    private ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
-
+    @Override
     public void addImpsConnection(ImpsConnection impsConnection) {
         if (!impsConnections.contains(impsConnection)) {
             impsConnections.add(impsConnection);
@@ -177,27 +175,6 @@ public class WebSocketConnection implements IConnection {
         return msg;
     }
 
-    private void parseMessage(String message) {
-        try {
-            JSONObject object = new JSONObject(message);
-            if (!object.has("pkg_type")) {
-                return;
-            }
-            String pkg_type = object.getString("pkg_type");
-
-            if (pkg_type.equals("06") && object.has("msg_id")) {
-                PushResponse response = new PushResponse();
-                response.setMsgid(object.getString("msg_id"));
-                response.setSign(response.getSign());
-                sendMessage(gson.toJson(response));
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     private void notifyListener(boolean isConnected) {
         if (impsConnections != null && impsConnections.size() > 0) {
             for (ImpsConnection impsConnection : impsConnections) {
@@ -224,7 +201,7 @@ public class WebSocketConnection implements IConnection {
             for (ImpsConnection impsConnection : impsConnections) {
                 if (null == impsConnection)
                     continue;
-                impsConnection.sendMessage(message);
+                impsConnection.sendedMessage(message);
             }
         }
     }

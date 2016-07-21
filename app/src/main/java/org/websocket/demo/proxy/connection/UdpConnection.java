@@ -28,6 +28,7 @@ public class UdpConnection implements IConnection{
 
     private ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
 
+    @Override
     public void addImpsConnection(ImpsConnection impsConnection) {
         if (!impsConnections.contains(impsConnection)) {
             impsConnections.add(impsConnection);
@@ -136,7 +137,7 @@ public class UdpConnection implements IConnection{
 //                            impsConnection.receiveMsg(getMessage(response));
                 if (null == impsConnection)
                     continue;
-                impsConnection.sendMessage(message);
+                impsConnection.sendedMessage(message);
             }
         }
     }

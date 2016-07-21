@@ -94,7 +94,7 @@ public class NetworkConnectivityListener {
             for (Handler target : mHandlers.keySet()) {
                 Message message = Message.obtain(target, mHandlers.get(target));
                 target.sendMessage(message);
-                LogUtil.d(TAG, "-------->sendMessage\n");
+                LogUtil.d(TAG, "sendMessage");
             }
         }
     }

@@ -2,6 +2,7 @@ package org.websocket.demo.request;
 
 import android.util.Log;
 
+import org.websocket.demo.proxy.MessageId;
 import org.websocket.demo.util.Utils;
 
 /**
@@ -22,8 +23,8 @@ public class HeartbeatRequest extends BaseRequest {
      * sign : 签名
      */
 
-    private String pkg_type = "00";
-    private String apptype = "602";
+    private String pkg_type = MessageId.PKG_HEART;
+    private String apptype = Constant.apptype;
     private String sign = "";
 
     public String getPkg_type() {
@@ -46,18 +47,14 @@ public class HeartbeatRequest extends BaseRequest {
 
 //        apptype=412&deviceid=123456&pkg_id=1&pkg_type=04&platform=android&platform_ver=6.0.1&sdk=pushcore&userid=123abcdef
 
-        String signature = "apptype=" + apptype + "&" +
-                "deviceid=" + "352584060461735" + "&" +
-                "pkg_id=" + pkg_id + "&" +
-                "pkg_type=" + pkg_type + "&" +
-                "platform=" + "android" + "&" +
-                "platform_ver=" + android.os.Build.VERSION.RELEASE + "&" +
-                "sdk=" + "pushcore" + "&" +
-                "userid=" + "1217856" + "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";
+        String signature = "apptype=" + apptype + "&"
+                + "pkg_id=" + pkg_id + "&"
+                + "pkg_type=" + pkg_type
+                + Constant.secret_key;
 
-        Log.e("HeartbeatRequest", "-----------> before signature " + signature);
+        Log.e("HeartbeatRequest", " before signature " + signature);
         sign = Utils.toMd5(signature);
-        Log.e("HeartbeatRequest", "-----------> after signature " + sign);
+        Log.e("HeartbeatRequest", "after signature " + sign);
 
         return sign;
     }

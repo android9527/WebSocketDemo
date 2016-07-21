@@ -5,6 +5,14 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
+import org.websocket.demo.request.BindRequest;
+import org.websocket.demo.request.HeartbeatRequest;
+import org.websocket.demo.request.PushResponse;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
 import org.websocket.demo.request.Constant;
@@ -15,7 +23,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class ServiceProxy implements ScheduleTask.Callback {
+public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
     private TimeoutHandler timeoutHandler = new TimeoutHandler();
 
     private static final String TAG = "serviceProxy";
@@ -35,6 +43,10 @@ public class ServiceProxy implements ScheduleTask.Callback {
 
     ServiceHandler mServiceHandler;
 
+
+
+    private Gson gson = new Gson();
+
     /**
      * 消息请求队列
      */
@@ -51,6 +63,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
         mNetworkConnectivityListener.registerHandler(mServiceHandler,
                 EVENT_NETWORK_STATE_CHANGED);
         mNetworkConnectivityListener.startListening(context);
+        OkHttpWebSocketConnection.instance(mContext).addImpsConnection(this);
     }
 
     private static ServiceProxy serviceProxy;
@@ -79,7 +92,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
 
 
     /**
-     * 类名称：ServiceHandler 作者： lining 类描述：监听网络连接回调Handler 修改时间：
+     * 类描述：监听网络连接回调Handler 修改时间：
      */
     private final class ServiceHandler extends Handler {
         public ServiceHandler() {
@@ -139,10 +152,20 @@ public class ServiceProxy implements ScheduleTask.Callback {
         }
     }
 
+    @Override
+    public void receiveMsg(TcpMessage msg) {
+
+    }
+
+    @Override
+    public void receiveMsg(String msg) {
+        parseMessage(msg);
+    }
+
     /**
      * 当连接到服务器会回调该方法
      */
-//    @Override
+    @Override
     public void connectedNotify(boolean status) {
         LogUtil.d(TAG, "connectedNotify:" + "ConnectStatus:" + status);
 
@@ -151,14 +174,25 @@ public class ServiceProxy implements ScheduleTask.Callback {
             stopHeartBeat();
 
             cancelAllRequest();
-
-            return;
+        }else{
+            startBindClient();
         }
 
 //        login();
         //TODO
 
         // bind();
+    }
+
+    @Override
+    public void sendedMessage(String msg) {
+
+    }
+
+    private void startBindClient(){
+        BindRequest request = new BindRequest();
+        request.setSign(request.getSign());
+        sendMessage(gson.toJson(request));
     }
 
     /**
@@ -279,7 +313,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
 
 
     /**
-     * 方法名称：processRsp 作者：lining 方法描述：处理响应消息 输入参数：@param socketMessage
+     * 方法描述：处理响应消息 输入参数：@param socketMessage
      * 返回类型：void： 备注：
      */
     private void processRsp(TcpMessage tcpMessage) {
@@ -297,7 +331,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：getSocketRequest 作者：lining 方法描述：获取包含指定消息的请求 输入参数：@param
+     * 方法描述：获取包含指定消息的请求 输入参数：@param
      * socketMessage 输入参数：@return 返回类型：SocketRequest： 备注：
      */
     public SocketRequest getSocketRequest(short sequenceId) {
@@ -444,7 +478,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
 
 
     /**
-     * 方法名称：sendHeartBeatRequest 作者：lining 方法描述：发送心跳请求 输入参数： 返回类型：void： 备注：
+     * 方法描述：发送心跳请求 输入参数： 返回类型：void： 备注：
      */
     public void sendHeartBeatRequest() {
         LogUtil.d(TAG, "------->sendHeartBeatRequest");
@@ -458,6 +492,10 @@ public class ServiceProxy implements ScheduleTask.Callback {
 //            request.setReconnect(false);
 //            // 发送心跳请求
 //            Http.sendRequest(request);
+
+            HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
+            heartbeatRequest.setSign(heartbeatRequest.getSign());
+            sendMessage(gson.toJson(heartbeatRequest));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -487,7 +525,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：delAllSocketRequest 作者：lining 方法描述：删除所有请求 输入参数: 返回类型：void 备注：
+     * 方法描述：删除所有请求 输入参数: 返回类型：void 备注：
      */
     private void delAllSocketRequest() {
         if (isEmptyReqQueue()) {
@@ -510,7 +548,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：clearAll 作者：lining 方法描述：清除内存数据 输入参数: 返回类型：void 备注：
+     * 方法描述：清除内存数据 输入参数: 返回类型：void 备注：
      */
     private void clearAll() {
         // 清除缓存数据
@@ -549,7 +587,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：delSocketRequest 作者：lining 方法描述：从请求队列中删除一个请求 输入参数:@param
+     * 方法描述：从请求队列中删除一个请求 输入参数:@param
      * socketRequest 返回类型：void 备注：
      */
     public void delSocketRequest(SocketRequest socketRequest) {
@@ -560,7 +598,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：delSocketRequest 作者：lining 方法描述：删除一个流水号的请求 输入参数：@param
+     * 方法描述：删除一个流水号的请求 输入参数：@param
      * sequenceNumber 返回类型：void： 备注：
      */
     private void delSocketRequest(short sequenceNumber) {
@@ -572,7 +610,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
 
 
     /**
-     * 方法名称：send 作者：lining 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
+     * 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
     public boolean send(SocketRequest socketRequest) {
         boolean result = false;
@@ -596,7 +634,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：addSocketRequest 作者：lining 方法描述：加入请求到队列中 输入参数：@param socketRequest
+     * 方法描述：加入请求到队列中 输入参数：@param socketRequest
      * 返回类型：void： 备注：
      */
     private void addSocketRequest(SocketRequest socketRequest) {
@@ -607,7 +645,7 @@ public class ServiceProxy implements ScheduleTask.Callback {
     }
 
     /**
-     * 方法名称：sendMessage 作者：lining 方法描述：发送消息 输入参数：@param message 输入参数：@throws
+     * 方法描述：发送消息 输入参数：@param message 输入参数：@throws
      * IOException 返回类型：void： 备注：
      */
     private void sendMessage(SocketRequest request) throws IOException {
@@ -646,4 +684,48 @@ public class ServiceProxy implements ScheduleTask.Callback {
 //        }
 //
 //    }
+
+
+    private void sendMessage(String message){
+        OkHttpWebSocketConnection.instance(mContext).sendMessage(message);
+    }
+
+    private void parseMessage(String message) {
+        try {
+            JSONObject object = new JSONObject(message);
+            if (!object.has("pkg_type")) {
+                return;
+            }
+            String pkg_type = object.getString("pkg_type");
+
+            switch (pkg_type) {
+
+                // 绑定不成功
+                case MessageId.PKG_DEVICE_BIND:
+
+                    break;
+
+                // 绑定成功
+                case MessageId.PKG_DEVICE_BIND_ACK:
+                    if(object.has("respcd")){
+                        startHeartBeat();
+                    }
+                    break;
+                // 收到推送
+                case MessageId.PKG_DEVICE_PUSH:
+                    if (object.has("msg_id")) {
+                        PushResponse response = new PushResponse();
+                        response.setMsgid(object.getString("msg_id"));
+                        response.setSign(response.getSign());
+                        sendMessage(gson.toJson(response));
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

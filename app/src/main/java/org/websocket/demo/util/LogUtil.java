@@ -161,7 +161,7 @@ public class LogUtil {
                 } else {
                     int b = st.getClassName().lastIndexOf(".") + 1;
                     String tag = st.getClassName().substring(b);
-                    String message = tag + "-------->" + st.getMethodName() + "():" + st.getLineNumber() + "-------->" + msg;
+                    String message = tag + "-------->" + st.getMethodName() + "():" + st.getLineNumber() + msg;
                     return message;
                 }
 

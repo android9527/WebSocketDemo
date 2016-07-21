@@ -2,6 +2,8 @@ package org.websocket.demo.request;
 
 import android.util.Log;
 
+import org.websocket.demo.proxy.MessageId;
+import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.Utils;
 
 /**
@@ -28,7 +30,7 @@ public class BindRequest extends BaseRequest {
 
 
     private static final String TAG = "BindRequest";
-    private String pkg_type="04";
+    private String pkg_type = MessageId.PKG_DEVICE_BIND;
     private String apptype = Constant.apptype;
     private String sign;
     private String userid = Constant.userid;
@@ -58,17 +60,17 @@ public class BindRequest extends BaseRequest {
 //        apptype=412&deviceid=123456&pkg_id=1&pkg_type=04&platform=android&platform_ver=6.0.1&sdk=pushcore&userid=123abcdef
 
         String signature = "apptype=" + apptype + "&" +
-                "deviceid="+deviceid + "&" +
+                "deviceid=" + deviceid + "&" +
                 "pkg_id=" + pkg_id + "&" +
                 "pkg_type=" + pkg_type + "&" +
                 "platform=" + platform + "&" +
                 "platform_ver=" + platform_ver + "&" +
                 "sdk=" + sdk + "&" +
-                "userid=" + userid + "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";
+                "userid=" + userid + Constant.secret_key;
 
-        Log.e(TAG, "-----------> before signature " + signature);
+        LogUtil.d(TAG, "before signature " + signature);
         sign = Utils.toMd5(signature);
-        Log.e(TAG, "-----------> after signature " + sign);
+        LogUtil.d(TAG, "after signature " + sign);
 
         return sign;
     }

@@ -3,6 +3,8 @@ package org.websocket.demo.request;
 import android.os.SystemClock;
 import android.util.Log;
 
+import org.websocket.demo.proxy.MessageId;
+import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.Utils;
 
 /**
@@ -17,11 +19,11 @@ public class PushResponse extends BaseRequest {
      * arrival_time : 收到消息时间, 10 位时间戳
      */
 
-    private String pkg_type = "07";
-    private String apptype = "602";
+    private String pkg_type = MessageId.PKG_DEVICE_PUSH_ACK;
+    private String apptype = Constant.apptype;
     private String sign;
     private String msgid;
-    private String arrival_time = SystemClock.currentThreadTimeMillis() / 1000 + "";
+    private String arrival_time = System.currentTimeMillis() / 1000 + "";
 
     public PushResponse() {
         super();
@@ -36,18 +38,16 @@ public class PushResponse extends BaseRequest {
     }
 
     public String getSign() {
-        String signature = "apptype=" + apptype + "&" +
-                "deviceid="+"352584060461735" + "&" +
-                "pkg_id=" + pkg_id + "&" +
-                "pkg_type=" + pkg_type + "&" +
-                "platform=" + "android" + "&" +
-                "platform_ver=" + android.os.Build.VERSION.RELEASE + "&" +
-                "sdk=" + "pushcore" + "&" +
-                "userid=" + "1217856" + "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";
+        String signature = "apptype=" + apptype + "&"
+                + "arrival_time=" + arrival_time + "&"
+                + "msgid=" + msgid + "&"
+                + "pkg_id=" + pkg_id + "&"
+                + "pkg_type=" + pkg_type
+                + Constant.secret_key;
 
-        Log.e("HeartbeatRequest", "-----------> before signature " + signature);
+        LogUtil.d("HeartbeatRequest", "before signature " + signature);
         sign = Utils.toMd5(signature);
-        Log.e("HeartbeatRequest", "-----------> after signature " + sign);
+        LogUtil.d("HeartbeatRequest", "after signature " + sign);
         return sign;
     }
 

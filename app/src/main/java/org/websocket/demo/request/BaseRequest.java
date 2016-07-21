@@ -17,7 +17,7 @@ public class BaseRequest {
     public void setPkg_id() {
         this.pkg_id = Constant.messageId + "";
         Constant.messageId++;
-        if (Constant.messageId >= Integer.MAX_VALUE) {
+        if (Constant.messageId >= Short.MAX_VALUE) {
             Constant.messageId = 1;
         }
     }

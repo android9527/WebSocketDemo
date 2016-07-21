@@ -1,5 +1,6 @@
 package org.websocket.demo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,8 +15,10 @@ import com.google.gson.Gson;
 import org.java_websocket.WebSocketImpl;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.TcpMessage;
-import org.websocket.demo.proxy.connection.WebSocketConnection;
+import org.websocket.demo.proxy.connection.IConnection;
+import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
 import org.websocket.demo.request.BindRequest;
+import org.websocket.demo.request.Constant;
 import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 
@@ -35,7 +38,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
     private static final int MESSAGE_SEND = MESSAGE_RECEIVE + 1;
 
-    private WebSocketConnection client;
+    private IConnection client;
 
     private Handler handler = new Handler() {
         @Override
@@ -64,10 +67,13 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_client);
 
+        startService(new Intent(ChatClientActivity.this, WebSocketService.class));
+
         btnConnect = (Button) findViewById(R.id.btnConnect);
         btnClose = (Button) findViewById(R.id.btnClose);
         btnBind = (Button) findViewById(R.id.btnBind);
         etAddress = (EditText) findViewById(R.id.etAddress);
+        etAddress.setText(Constant.URL);
         Button btnClear = (Button) findViewById(R.id.btnClear);
         etDetails = (EditText) findViewById(R.id.etDetails);
         btnHeartbeat = (Button) findViewById(R.id.btnHeartbeat);
@@ -82,7 +88,8 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
         findViewById(R.id.btnBind).setOnClickListener(this);
 
-        client = new WebSocketConnection(this.getApplicationContext());
+//        client = new WebSocketConnection(this.getApplicationContext());
+        client = OkHttpWebSocketConnection.instance(this);
         client.addImpsConnection(this);
         ScheduleTaskService.getInstance().init(this.getApplicationContext());
         onClosed();
@@ -93,6 +100,8 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         switch (v.getId()) {
             case R.id.btnConnect:
                 client.connect(etAddress.getText().toString());
+
+//                connect();
                 break;
             case R.id.btnClose:
                 client.disConnect();
@@ -114,10 +123,14 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         }
     }
 
+    private void sendMessage(String message) {
+        client.sendMessage(message);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        client.disConnect();
+//        client.disConnect();
     }
 
     private void onConnected() {
@@ -156,9 +169,10 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     }
 
     @Override
-    public void sendMessage(String msg) {
+    public void sendedMessage(String msg) {
         Message message = handler.obtainMessage(MESSAGE_SEND);
         message.obj = msg;
         handler.sendMessage(message);
     }
+
 }

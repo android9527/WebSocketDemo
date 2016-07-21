@@ -6,9 +6,12 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import org.websocket.demo.proxy.Http;
+import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.Request;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.SocketRequest;
+import org.websocket.demo.proxy.TcpMessage;
+import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
 
 
@@ -38,7 +41,7 @@ public class WebSocketService extends Service
 
 
     /**
-     * 方法名称：onCreate 作者：lining 方法描述： 输入参数： 返回类型：
+     * 方法描述： 输入参数： 返回类型：
      *
      * @see android.app.Service#onCreate() 备注:
      */
@@ -46,12 +49,14 @@ public class WebSocketService extends Service
     public void onCreate()
     {
         super.onCreate();
+        ScheduleTaskService.getInstance().init(this);
         serviceProxy = ServiceProxy.getInstance(this);
         instance = this;
+
     }
 
     /**
-     * 方法名称：onStart 作者：lining 方法描述： 输入参数：@param intent 输入参数：@param startId 返回类型：
+     * 方法描述： 输入参数：@param intent 输入参数：@param startId 返回类型：
      *
      * @see android.app.Service#onStart(android.content.Intent, int) 备注：
      */
@@ -63,7 +68,7 @@ public class WebSocketService extends Service
     }
 
     /**
-     * 方法名称：onBind 作者：lining 方法描述： 输入参数：@param intent 输入参数：@return 返回类型：
+     * 方法描述： 输入参数：@param intent 输入参数：@return 返回类型：
      *
      * @see android.app.Service#onBind(android.content.Intent) 备注：
      */
@@ -81,7 +86,7 @@ public class WebSocketService extends Service
     }
 
     /**
-     * 类名称：ServiceBinder 作者： lining 类描述： 修改时间：
+     * 类描述： 修改时间：
      *
      */
     public class ServiceBinder extends Binder
@@ -93,7 +98,7 @@ public class WebSocketService extends Service
     }
 
     /**
-     * (non-Javadoc) 方法名称：onUnbind 作者：lining 方法描述： 输入参数：@param intent 输入参数：@return
+     * 方法描述： 输入参数：@param intent 输入参数：@return
      * 返回类型：
      *
      * @see android.app.Service#onUnbind(android.content.Intent) 备注：
@@ -106,7 +111,7 @@ public class WebSocketService extends Service
     }
 
     /**
-     * (non-Javadoc) 方法名称：onDestroy 作者：lining 方法描述： 输入参数： 返回类型：
+     * 方法描述： 输入参数： 返回类型：
      *
      * @see android.app.Service#onDestroy() 备注：
      */
@@ -119,7 +124,7 @@ public class WebSocketService extends Service
     }
 
     /**
-     * 方法名称：onStartCommand 作者：lining 方法描述： 输入参数：@param intent 输入参数：@param flags
+     * 方法描述： 输入参数：@param intent 输入参数：@param flags
      * 输入参数：@param startId 输入参数：@return 返回类型：
      *
      * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
@@ -143,9 +148,8 @@ public class WebSocketService extends Service
         return super.onStartCommand(intent, flags, startId);
     }
 
-
     /**
-     * 方法名称：send 作者：lining 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
+     * 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
     public boolean send(SocketRequest socketRequest)
     {

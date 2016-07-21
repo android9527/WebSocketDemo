@@ -5,20 +5,33 @@ package org.websocket.demo.request;
  */
 public class Constant {
 
-    public static int messageId = 1;
+    public static short messageId = 1;
 
-    public static String apptype = "602";
     public static String userid = "1217856";
     public static String deviceid = "352584060461735";
     public static String platform = "android";
     public static String platform_ver = android.os.Build.VERSION.RELEASE;
     public static String sdk = "pushcore";
+//    public static String apptype = "602";
+//    public static String secret_key = "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";
+//    public static String URL = "ws://172.100.101.106:9997";
 
+
+    public static String URL = "ws://push.qfpay.com";
+    public static String apptype = "601";
+    public static String secret_key = "123456";
+
+    /**
+     * 超时时间
+     */
     public static final int DEFAULT_TIMEOUT = 30 * 1000;
 
     public static final int DEFAULT_RESEND_COUNT = 3;
 
-    public static final int DEFAULT_HEARTBEAT_INTERVAL = 1000 * 10;
+    /**
+     * 心跳间隔
+     */
+    public static final int DEFAULT_HEARTBEAT_INTERVAL = 1000 * 30;
 
     /**
      * 请求成功

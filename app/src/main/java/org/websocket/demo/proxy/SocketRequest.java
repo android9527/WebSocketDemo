@@ -60,7 +60,7 @@ public abstract class SocketRequest
 
 
     /**
-     * 方法名称：getIp 作者：lining 方法描述：获取ip 返回类型：@return the ip 备注：
+     * 方法描述：获取ip 返回类型：@return the ip 备注：
      */
     public String getIp()
     {
@@ -68,7 +68,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：setIp 作者：lining 方法描述：设置ip 输入参数： @param ip 返回类型： void 备注：
+     * 方法描述：设置ip 输入参数： @param ip 返回类型： void 备注：
      */
     public void setIp(String ip)
     {
@@ -76,7 +76,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：getPort 作者：lining 方法描述：获取port 返回类型：@return the port 备注：
+     * 方法描述：获取port 返回类型：@return the port 备注：
      */
     public String getPort()
     {
@@ -84,7 +84,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：setPort 作者：lining 方法描述：设置port 输入参数： @param port 返回类型： void 备注：
+     * 方法描述：设置port 输入参数： @param port 返回类型： void 备注：
      */
     public void setPort(String port)
     {
@@ -92,7 +92,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：getSequenceNumber 作者：lining 方法描述：获取sequenceNumber 返回类型：@return the
+     * 方法描述：获取sequenceNumber 返回类型：@return the
      * sequenceNumber 备注：
      */
     public short getSequenceNumber()
@@ -101,7 +101,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：setSequenceNumber 作者：lining 方法描述：设置sequenceNumber 输入参数： @param
+     * 方法描述：设置sequenceNumber 输入参数： @param
      * sequenceNumber 返回类型： void 备注：
      */
     public void setSequenceNumber(short sequenceNumber)
@@ -110,7 +110,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：getMessageType 作者：lining 方法描述：获取messageType 返回类型：@return the
+     * 方法描述：获取messageType 返回类型：@return the
      * messageType 备注：
      */
     public int getMessageType()
@@ -129,7 +129,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：getSocketTimer 作者：lining 方法描述：获取socketTimer 返回类型：@return the
+     * 方法描述：获取socketTimer 返回类型：@return the
      * socketTimer 备注：
      */
     public ISocketTimer getSocketTimer()
@@ -138,7 +138,7 @@ public abstract class SocketRequest
     }
 
     /**
-     * 方法名称：setSocketTimer 作者：lining 方法描述：设置socketTimer 输入参数： @param socketTimer
+     * 方法描述：设置socketTimer 输入参数： @param socketTimer
      * 返回类型： void 备注：
      */
     public void setSocketTimer(ISocketTimer socketTimer)

@@ -72,8 +72,8 @@ public class OkHttp3Creator {
             SSLSocketFactory socketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(20 * 1000, TimeUnit.MILLISECONDS)
-                    .readTimeout(0, TimeUnit.MILLISECONDS)
+                    .connectTimeout(90 * 1000, TimeUnit.MILLISECONDS)
+                    .readTimeout(10 * 60 * 1000, TimeUnit.MILLISECONDS)
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
                     .sslSocketFactory(socketFactory)
                     .hostnameVerifier(HOSTNAME_VERIFIER);
