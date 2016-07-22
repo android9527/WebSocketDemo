@@ -44,7 +44,7 @@ public class WebSocketService extends Service {
         super.onCreate();
         instance = this;
         ScheduleTaskService.getInstance().init(this);
-        serviceProxy = new ServiceProxy(this);
+        serviceProxy = ServiceProxy.getInstance(this);
 
     }
 

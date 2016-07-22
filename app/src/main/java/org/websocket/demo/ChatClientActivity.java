@@ -109,13 +109,13 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
                 break;
 
             case R.id.btnBind:
-                ServiceProxy.getInstance(getApplicationContext()).startBindClient();
+                ServiceProxy.getInstance(this).startBindClient();
                 break;
             case R.id.btnClear:
                 etDetails.getText().clear();
                 break;
             case R.id.btnHeartbeat:
-                ServiceProxy.getInstance(getApplicationContext()).sendHeartBeatRequest();
+                ServiceProxy.getInstance(this).sendHeartBeatRequest();
                 break;
         }
     }

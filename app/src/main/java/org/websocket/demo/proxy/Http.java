@@ -1,7 +1,5 @@
 package org.websocket.demo.proxy;
 
-import android.util.Log;
-
 import org.websocket.demo.AsyncTaskExecutors;
 import org.websocket.demo.WebSocketService;
 import org.websocket.demo.request.Constant;
@@ -37,30 +35,21 @@ public class Http implements Runnable {
     private boolean sendMessageToServer() {
         boolean bRet = false;
 
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            LogUtil.d(TAG, "begin send request to server");
+        LogUtil.d(TAG, "begin send request to server");
+        if (null == mService) {
+            return false;
         }
-
-        if (null != mService) {
-            LogUtil.d(TAG, "sendMesageToService:requestId = "
-                    + currentRequest.getSequenceNumber());
-
-            if (!mService.send(currentRequest)) {
-                ITimerHandler timerHandler = currentRequest.getParam()
-                        .getTimeHandler();
-                if (null != timerHandler) {
-                    timerHandler.timeoutHandle(
-                            currentRequest.getSequenceNumber(),
-                            Constant.REQUEST_SHUTDOWN);
-                }
-
-                LogUtil.d(TAG,
-                        "sendMesageToService Error, requestId:"
-                                + currentRequest.getSequenceNumber());
-            } else {
-                if (currentRequest.isNeedResend()) {
-                    bRet = true;
-                }
+        if (!mService.send(currentRequest)) {
+            ITimerHandler timerHandler = currentRequest.getParam()
+                    .getTimeHandler();
+            if (null != timerHandler) {
+                timerHandler.timeoutHandle(
+                        currentRequest.getSequenceNumber(),
+                        Constant.REQUEST_SHUTDOWN);
+            }
+        } else {
+            if (currentRequest.isNeedResend()) {
+                bRet = true;
             }
         }
         return bRet;
@@ -109,27 +98,25 @@ public class Http implements Runnable {
      * 取消请求操作
      */
     private void cancelRequest() {
-        if (null != mService) {
-            try {
-                mService.delSocketRequest(currentRequest);
-            } catch (Exception e) {
-                e.printStackTrace();
-                LogUtil.d("http:cancelRequest exception", e.getMessage());
-            }
+        if (null == mService) {
+            return;
         }
+        mService.delSocketRequest(currentRequest);
     }
 
     @Override
     public void run() {
         if (sendMessageToServer()) {
             ScheduleTaskService
-                    .getInstance()
-                    .getScheduleTaskManager()
+                    .getInstance().getScheduleTaskManager()
                     .startSchedule(callback,
                             currentRequest.getParam().getTimeout());
         }
     }
 
+    /**
+     * 停止超时重发
+     */
     private void stopReSend() {
         ScheduleTaskService
                 .getInstance()
@@ -155,9 +142,6 @@ public class Http implements Runnable {
             ITimerHandler timerHandler = currentRequest.getParam()
                     .getTimeHandler();
             if (null != timerHandler) {
-                LogUtil.d(TAG,
-                        "Execute request timeout,requestID:"
-                                + currentRequest.getSequenceNumber());
 
                 timerHandler.timeoutHandle(currentRequest.getSequenceNumber(),
                         Constant.REQUEST_TIMEOUT);

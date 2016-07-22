@@ -103,8 +103,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
         @Override
         public void onHandleMessage(Message msg, ServiceProxy proxy) {
-            LogUtil.d(TAG, "handleMessage");
-
             switch (msg.what) {
                 case EVENT_NETWORK_STATE_CHANGED:
                     proxy.networkStateChanged();
@@ -158,14 +156,11 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     @Override
     public void connectedNotify(boolean status) {
         LogUtil.d(TAG, "connectedNotify:" + "ConnectStatus:" + status);
-
-        if (!status) {
-
-            stopHeartBeat();
-
-            cancelAllRequest();
-        } else {
+        if (status) {
             startBindClient();
+        } else {
+            stopHeartBeat();
+            cancelAllRequest();
         }
     }
 
@@ -190,14 +185,10 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     public void stopReBindClient() {
         reBindCount = 0;
-        try {
-            ScheduleTaskService.getInstance()
-                    .getScheduleTaskManager()
-                    .stopSchedule(reBindCallback);
-            LogUtil.d(TAG, "Stop stopReBindClient...leave");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ScheduleTaskService.getInstance()
+                .getScheduleTaskManager()
+                .stopSchedule(reBindCallback);
+        LogUtil.d(TAG, "Stop stopReBindClient...leave");
     }
 
     /**
@@ -335,20 +326,24 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                 .startSchedule(this, getHeartBeatInterval());
     }
 
+    /**
+     * 心跳时间间隔
+     *
+     * @return 时间间隔
+     */
     private long getHeartBeatInterval() {
         return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT_INTERVAL,
                 Constant.DEFAULT_HEARTBEAT_INTERVAL);
     }
 
+    /**
+     * 停止心跳数据
+     */
     public void stopHeartBeat() {
-        try {
-            ScheduleTaskService.getInstance()
-                    .getScheduleTaskManager()
-                    .stopSchedule(this);
-            LogUtil.d(TAG, "Start Stop HeartBeat...leave");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ScheduleTaskService.getInstance()
+                .getScheduleTaskManager()
+                .stopSchedule(this);
+        LogUtil.d(TAG, "Stop HeartBeat...leave");
     }
 
     /**
