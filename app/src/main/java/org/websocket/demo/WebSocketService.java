@@ -14,10 +14,8 @@ import org.websocket.demo.util.LogUtil;
 
 /**
  * 类名称：VtdService 类描述：通讯服务服务 修改时间：
- *
  */
-public class WebSocketService extends Service
-{
+public class WebSocketService extends Service {
 
     static final String TAG = "VtdService";
 
@@ -31,8 +29,7 @@ public class WebSocketService extends Service
 
     private ServiceProxy serviceProxy;
 
-    public static WebSocketService getService()
-    {
+    public static WebSocketService getService() {
         return instance;
     }
 
@@ -43,8 +40,7 @@ public class WebSocketService extends Service
      * @see android.app.Service#onCreate() 备注:
      */
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
         instance = this;
         ScheduleTaskService.getInstance().init(this);
@@ -53,24 +49,11 @@ public class WebSocketService extends Service
     }
 
     /**
-     * 方法描述： 输入参数：@param intent 输入参数：@param startId 返回类型：
-     *
-     * @see android.app.Service#onStart(android.content.Intent, int) 备注：
-     */
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onStart(Intent intent, int startId)
-    {
-        super.onStart(intent, startId);
-    }
-
-    /**
      * 方法描述： 输入参数：@param intent 输入参数：@return 返回类型：
      *
      * @see android.app.Service#onBind(android.content.Intent) 备注：
      */
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
@@ -78,18 +61,15 @@ public class WebSocketService extends Service
         serviceProxy.delSocketRequest(currentRequest);
     }
 
-    public SocketRequest getSocketRequest(short sequenceNumber) {
+    public SocketRequest getSocketRequest(String sequenceNumber) {
         return serviceProxy.getSocketRequest(sequenceNumber);
     }
 
     /**
      * 类描述： 修改时间：
-     *
      */
-    public class ServiceBinder extends Binder
-    {
-        public ServiceProxy getService()
-        {
+    public class ServiceBinder extends Binder {
+        public ServiceProxy getService() {
             return serviceProxy;
         }
     }
@@ -101,8 +81,7 @@ public class WebSocketService extends Service
      * @see android.app.Service#onUnbind(android.content.Intent) 备注：
      */
     @Override
-    public boolean onUnbind(Intent intent)
-    {
+    public boolean onUnbind(Intent intent) {
         LogUtil.d(TAG, "onUnbind");
         return super.onUnbind(intent);
     }
@@ -113,8 +92,7 @@ public class WebSocketService extends Service
      * @see android.app.Service#onDestroy() 备注：
      */
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
         LogUtil.d(TAG, "onDestroy ...... ");
         // TODO
@@ -125,45 +103,35 @@ public class WebSocketService extends Service
      * 输入参数：@param startId 输入参数：@return 返回类型：
      *
      * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
-     *      备注：
+     * 备注：
      */
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         LogUtil.d(TAG, "onStartCommand");
         Http.setMService(this);
-        if (null != intent)
-        {
+        if (null != intent) {
             LogUtil.d(TAG, "onStartCommand intent != null");
-        }
-        else
-        {
+        } else {
             LogUtil.d(TAG, "onStartCommand service restart by System");
         }
         // TODO
 //        connect(false);
-        return super.onStartCommand(intent, flags, startId);
+//        return super.onStartCommand(intent, flags, startId);
+        return START_REDELIVER_INTENT;
     }
 
     /**
      * 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
-    public boolean send(SocketRequest request)
-    {
+    public boolean send(SocketRequest request) {
         return serviceProxy.send(request);
     }
 
 
-    public boolean isShutdown()
-    {
-        return true;
-    }
-
     /**
      * 重定向
      */
-    public void forwardService()
-    {
+    public void forwardService() {
 //        close();
         serviceProxy.cancelAllRequest();
 //        connect(true);

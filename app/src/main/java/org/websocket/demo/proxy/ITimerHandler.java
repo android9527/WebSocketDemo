@@ -1,5 +1,5 @@
 package org.websocket.demo.proxy;
 
 public interface ITimerHandler {
-    void timeoutHandle(short sequenceNumber, int status);
+    void timeoutHandle(String sequenceNumber, int status);
 }

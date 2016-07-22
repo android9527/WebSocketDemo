@@ -3,10 +3,7 @@ package org.websocket.demo.proxy.connection;
 import android.content.Context;
 import android.util.Log;
 
-import org.websocket.demo.AsyncTaskExecutors;
 import org.websocket.demo.proxy.OkHttp3Creator;
-import org.websocket.demo.proxy.TcpMessage;
-import org.websocket.demo.proxy.TcpMessageParser;
 import org.websocket.demo.util.LogUtil;
 
 import java.io.IOException;
@@ -114,19 +111,14 @@ public class OkHttpWebSocketConnection extends BaseConnection {
     }
 
     @Override
-    public void sendMessage(final String message) {
+    public boolean sendMessage(final String message) {
 
         Log.e("ChatClientActivity", "send To Server " + message);
 
         if (socket == null || message == null) {
-            return;
+            return false;
         }
-        AsyncTaskExecutors.executeTask(new Runnable() {
-            @Override
-            public void run() {
-                sendMsgToServer(message);
-            }
-        });
+                return sendMsgToServer(message);
     }
 
     @Override
@@ -134,22 +126,16 @@ public class OkHttpWebSocketConnection extends BaseConnection {
         return socket != null;
     }
 
-    private synchronized void sendMsgToServer(final String message) {
+    private synchronized boolean sendMsgToServer(final String message) {
         try {
             RequestBody requestBody = RequestBody.create(okhttp3.ws.WebSocket.TEXT, message);
             socket.sendMessage(requestBody);
             notifySendMessage(message);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    // TODO 消息封装
-    private TcpMessage getMessage(String response) throws IOException {
-        TcpMessage msg = null;
-        msg = TcpMessageParser.bytes2TcpMsg(response.getBytes());
-        return msg;
+        return false;
     }
 
 }

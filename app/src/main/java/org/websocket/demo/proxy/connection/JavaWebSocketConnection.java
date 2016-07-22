@@ -6,9 +6,7 @@ import android.util.Log;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
-import org.websocket.demo.proxy.OkHttp3Creator;
 import org.websocket.demo.request.Constant;
-import org.websocket.demo.util.LogUtil;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -43,8 +41,9 @@ public class JavaWebSocketConnection extends BaseConnection {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public boolean sendMessage(String message) {
         // TODO
+        return super.sendMessage(message);
     }
 
     @Override

@@ -9,7 +9,7 @@ public class Constant {
 
     public static String userid = "1217856";
     public static String platform = "android";
-    public static String platform_ver = android.os.Build.VERSION.RELEASE;
+    public static String platform_ver = "6.0.0";
     public static String sdk = "pushcore";
 //    public static String apptype = "602";
 //    public static String secret_key = "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";
@@ -20,6 +20,8 @@ public class Constant {
     public static String apptype = "601";
     public static String secret_key = "123456";
 
+    public static short MESSAGE_MAX_LENGTH = 10 * 1024;
+
     /**
      * Socket连接超时时间
      */
@@ -28,7 +30,7 @@ public class Constant {
     /**
      * 消息读取超时时间
      */
-    public static final int DEFAULT_TIMEOUT = 30 * 1000;
+    public static final int DEFAULT_TIMEOUT = 10 * 1000;
 
     /**
      * 消息超时重发次数

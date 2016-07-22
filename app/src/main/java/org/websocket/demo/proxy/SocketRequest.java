@@ -10,25 +10,6 @@ public final class SocketRequest {
     private int sendNum = 0;
 
     /**
-     * 全局流水号
-     */
-    private static short sequence = 0;
-
-    /**
-     * 获取当前的sequence
-     *
-     * @return
-     */
-    public static short getSequence() {
-        return sequence;
-    }
-
-    /**
-     * 在网络异常后，是否自动重连
-     */
-    private boolean isReconnect = true;
-
-    /**
      * 请求参数
      */
     private RequestParam param = null;
@@ -53,10 +34,7 @@ public final class SocketRequest {
     public SocketRequest(RequestParam param, TcpMessage msg) {
         this.param = param;
         setTcpMessage(msg);
-        if (sequence++ > MAX_SEQUENCE) {
-            sequence = 0;
-        }
-        setSequenceNumber(sequence);
+        setSequenceNumber(msg.getSequenceId());
     }
 
     /**
@@ -82,19 +60,6 @@ public final class SocketRequest {
     public void addSendNum() {
         this.sendNum++;
     }
-
-    public boolean isReconnect() {
-        return isReconnect;
-    }
-
-    public void setReconnect(boolean reconnect) {
-        this.isReconnect = reconnect;
-    }
-
-    /**
-     * 最大流水号
-     */
-    public static final short MAX_SEQUENCE = Short.MAX_VALUE;
 
     /**
      * TCP消息
@@ -140,7 +105,7 @@ public final class SocketRequest {
      * 方法描述：获取sequenceNumber 返回类型：@return the
      * sequenceNumber 备注：
      */
-    public short getSequenceNumber()
+    public String getSequenceNumber()
     {
         return tcpMessage.getSequenceId();
     }
@@ -149,18 +114,9 @@ public final class SocketRequest {
      * 方法描述：设置sequenceNumber 输入参数： @param
      * sequenceNumber 返回类型： void 备注：
      */
-    public void setSequenceNumber(short sequenceNumber)
+    public void setSequenceNumber(String sequenceNumber)
     {
         tcpMessage.setSequenceId(sequenceNumber);
-    }
-
-    /**
-     * 方法描述：获取messageType 返回类型：@return the
-     * messageType 备注：
-     */
-    public int getMessageType()
-    {
-        return tcpMessage.getMessageId();
     }
 
     public TcpMessage getTcpMessage()

@@ -3,6 +3,7 @@ package org.websocket.demo.proxy;
 import android.content.Context;
 import android.net.NetworkInfo;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 
@@ -10,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
+import org.websocket.demo.request.BaseRequest;
 import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.request.PushResponse;
@@ -52,7 +54,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     /**
      * 消息请求队列
      */
-    private static Hashtable<Short, SocketRequest> reqQueue = new Hashtable<>();
+    private static Hashtable<String, SocketRequest> reqQueue = new Hashtable<>();
 
     public ServiceProxy(Context context) {
         mContext = context.getApplicationContext();
@@ -61,11 +63,11 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
     private void initListener(Context context) {
-        mServiceHandler = new ServiceHandler(ServiceProxy.this);
-        mNetworkConnectivityListener = new NetworkConnectivityListener();
-        mNetworkConnectivityListener.registerHandler(mServiceHandler,
-                EVENT_NETWORK_STATE_CHANGED);
-        mNetworkConnectivityListener.startListening(context);
+//        mServiceHandler = new ServiceHandler(ServiceProxy.this);
+//        mNetworkConnectivityListener = new NetworkConnectivityListener();
+//        mNetworkConnectivityListener.registerHandler(mServiceHandler,
+//                EVENT_NETWORK_STATE_CHANGED);
+//        mNetworkConnectivityListener.startListening(context);
         connection.addImpsConnection(this);
     }
 
@@ -86,8 +88,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * @return 是否连接
      */
     public boolean isConnected() {
-//        return VtdService.getService().isConnected();
-        // TODO
         return connection.isConnected();
     }
 
@@ -176,17 +176,20 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     /**
      * 绑定打印机
      */
-    private void startBindClient() {
+    public void startBindClient() {
         BindRequest request = new BindRequest();
         request.setDeviceid(DeviceUtil.getUniqueId(mContext));
         request.setSign(request.getSign());
-        sendMessage(gson.toJson(request));
+//        sendMessage(gson.toJson(request));
+
+        sendRequest(request, true, true);
     }
 
     /**
      * 取消重连
      */
     public void stopReBindClient() {
+        reBindCount = 0;
         try {
             ScheduleTaskService.getInstance()
                     .getScheduleTaskManager()
@@ -238,7 +241,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     public Http sendRequest(TcpMessage msg, boolean isNeedResponse,
                             boolean isNeedResend) {
-        if (!couldSend(msg.getMessageId())) {
+        if (!isConnected()) {
             return null;
         }
 
@@ -246,7 +249,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         try {
             RequestParam param = new RequestParam();
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
-            param.setMessageId(msg.getMessageId());
             param.setTimeHandler(timeoutHandler);
             SocketRequest request = new SocketRequest(param, msg);
             request.setNeedRsp(isNeedResponse);
@@ -260,25 +262,27 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         return http;
     }
 
+
     /**
-     * 发送分包的请求(指定sequence)
+     * 发送无响应请求
      */
-    public Http sendMultiMsgRequest(TcpMessage tcpMessage, boolean isResponse,
-                                    boolean isNeedResend, short sequence) {
-        if (!couldSend(tcpMessage.getMessageId())) {
+    public Http sendRequest(BaseRequest request, boolean isNeedResponse,
+                            boolean isNeedResend) {
+        if (!isConnected()) {
             return null;
         }
-        Http http = null;
+
+        TcpMessage tcpMessage = new TcpMessage();
+        tcpMessage.setRequest(request);
+        Http http;
         try {
             RequestParam param = new RequestParam();
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
-            param.setMessageId(tcpMessage.getMessageId());
             param.setTimeHandler(timeoutHandler);
-            SocketRequest request = new SocketRequest(param, tcpMessage);
-            request.setNeedRsp(isResponse);
-            request.setNeedResend(isNeedResend);
-            request.setSequenceNumber(sequence);
-            http = Http.sendRequest(request);
+            SocketRequest socketRequest = new SocketRequest(param, tcpMessage);
+            socketRequest.setNeedRsp(isNeedResponse);
+            socketRequest.setNeedResend(isNeedResend);
+            http = Http.sendRequest(socketRequest);
         } catch (Exception e) {
             e.printStackTrace();
             http = null;
@@ -288,75 +292,12 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
     /**
-     * 发送多媒体事件信息
-     *
-     * @return sequenceId
-     */
-    public short sendMultiMediaRequest(TcpMessage tcpMessage) {
-        short sequenceId = -1;
-        if (!couldSend(tcpMessage.getMessageId())) {
-            return sequenceId;
-        }
-        try {
-            RequestParam param = new RequestParam();
-            param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
-            param.setMessageId(tcpMessage.getMessageId());
-            param.setTimeHandler(timeoutHandler);
-            SocketRequest request = new SocketRequest(param, tcpMessage);
-            request.setNeedRsp(true);
-            request.setNeedResend(true);
-            sequenceId = request.getSequenceNumber();
-            Http.sendRequest(request);
-        } catch (Exception e) {
-            e.printStackTrace();
-            sequenceId = -1;
-        }
-
-        return sequenceId;
-    }
-
-    /**
-     * 是否可以发送消息
-     *
-     * @return 登录标识
-     */
-    private boolean couldSend(short msgId) {
-        return false;
-//        return Constant.isLogin || MessageId.AUTHEN == msgId
-//                || MessageId.REGIST == msgId;
-    }
-
-    /**
-     * 发送通用应答
-     *
-     * @param answerId   对应的平台消息的ID
-     * @param sequenceId 对应的平台消息的流水号
-     * @param result     结果 CommonAnswerBody.SUCCESS, CommonAnswerBody.FAILED,
-     *                   CommonAnswerBody.ERROR, CommonAnswerBody.UNSUPPORT
-     *                   CommonAnswerBody.ALARM_CONFIRM
-     */
-    public Http sendCommonAnswer(int answerId, int sequenceId, byte result) {
-        TcpMessage msg = new TcpMessage();
-//        msg.setMessageId((short) MessageId.CLIENT_COMMON_ANSWER);
-//
-//        CommonAnswerBody body = new CommonAnswerBody();
-//        body.setAnswerSequenceId((short) sequenceId);
-//        body.setAnswerId((short) answerId);
-//        body.setResult(result);
-//
-//        msg.setBody(body.getBytes());
-
-        return sendRequest(msg, false, true);
-    }
-
-
-    /**
      * 方法描述：处理响应消息 输入参数：@param socketMessage
      * 返回类型：void： 备注：
      */
     private void processRsp(TcpMessage tcpMessage) {
         LogUtil.d(TAG, "processRsp enter");
-        SocketRequest request = (SocketRequest) getSocketRequest(tcpMessage.getAnswerSequenceId());
+        SocketRequest request = getSocketRequest(tcpMessage.getAnswerSequenceId());
 
         if (null == request) {
             LogUtil.d(TAG, "processRsp request == null");
@@ -364,7 +305,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
         request.getHttp().cancel();
 
-        serviceProxy.doResponse(tcpMessage);
+        doResponse(tcpMessage);
 
     }
 
@@ -372,8 +313,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：获取包含指定消息的请求 输入参数：@param
      * socketMessage 输入参数：@return 返回类型：SocketRequest： 备注：
      */
-    public SocketRequest getSocketRequest(short sequenceId) {
-        if (isEmptyReqQueue() || 0 == sequenceId) {
+    public SocketRequest getSocketRequest(String sequenceId) {
+        if (isEmptyReqQueue() || TextUtils.isEmpty(sequenceId)) {
             return null;
         }
         return reqQueue.get(sequenceId);
@@ -388,9 +329,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
 
         // 消息体
-        byte[] body = msg.getBody();
+        String body = msg.getBody();
 
-        switch ((int) msg.getMessageId()) {
+//        switch ((int) msg.getMessageId()) {
 //            case MessageId.SERVER_COMMON_ANSWER:
 //                commonAnswer(msg);
 //                break;
@@ -416,9 +357,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 //                    Log.e(TAG, "authentic failed , result = " + result);
 //                }
 //                break;
-            default:
-                break;
-        }
+//            default:
+//                break;
+//        }
 
 
     }
@@ -432,36 +373,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             return;
         }
 
-        switch ((int) msg.getMessageId()) {
-            default:
-                break;
-        }
-    }
-
-    private void commonAnswer(TcpMessage msg) {
-
-//        int result = TcpByteUtil.getByteValue(cab.getResult());
-//        switch (cab.getAnswerId())
-//        {
-//            case MessageId.HEARTBEAT:
-//                break;
-//            case MessageId.AUTHEN:
-//                if (result == CommonAnswerBody.SUCCESS)
-//                {
-//                    Log.d(TAG, "authentic SUCCESS ");
-//                    // 鉴权成功，开始心跳
-//                    startHeartBeat();
-//                }
-//                else
-//                {
-//                    // 鉴权未成功
-//                    Log.e(TAG, "authentic failed , result = " + result);
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-
     }
 
 
@@ -469,27 +380,11 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法名称：startHeartBeat 方法描述：启动心跳 输入参数： 返回类型：void： 备注：
      */
     public void startHeartBeat() {
-//        if (!stop)
-//        {
-//            LogUtil.log(TAG, "heartBeat stop is false");
-//            return;
-//        }
-
-//        init();
         // 启动心跳
         ScheduleTaskService.getInstance()
                 .getScheduleTaskManager()
                 .startSchedule(this, getHeartBeatInterval());
     }
-//    /**
-//     */
-//    private void init()
-//    {
-//        heartbeatInterval = getHeartBeatInterval();
-//        heartMsg = new TcpMessage();
-//        heartMsg.setMessageId((short) MessageId.HEARTBEAT);
-//        heartMsg.setPhoneNum(PhoneUtils.getInstance().getPhoneNum(this));
-//    }
 
     private long getHeartBeatInterval() {
         return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT_INTERVAL,
@@ -522,18 +417,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         LogUtil.d(TAG, "------->sendHeartBeatRequest");
         try {
 //            // 构造心跳请求
-//            RequestParam param = new RequestParam();
-//            param.setMessageId(heartMsg.getMessageId());
-//            param.setTimeHandler(this);
-//            Request request = new Request(param, heartMsg);
-//            // 设置不需要重连
-//            request.setReconnect(false);
-//            // 发送心跳请求
-//            Http.sendRequest(request);
-
             HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
             heartbeatRequest.setSign(heartbeatRequest.getSign());
-            sendMessage(gson.toJson(heartbeatRequest));
+            sendRequest(heartbeatRequest, true, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -610,12 +496,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     @Override
     public long doSchedule() {
 
-//        if (tcpChannel.isShutdown())
-//        {
-//            return 0;
-//        }
-
-
         if (!isConnected()) {
             return 0;
         }
@@ -640,8 +520,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：删除一个流水号的请求 输入参数：@param
      * sequenceNumber 返回类型：void： 备注：
      */
-    private void delSocketRequest(short sequenceNumber) {
-        if (isEmptyReqQueue() || sequenceNumber < 0) {
+    private void delSocketRequest(String sequenceNumber) {
+        if (isEmptyReqQueue() || TextUtils.isEmpty(sequenceNumber)) {
             return;
         }
         reqQueue.remove(sequenceNumber);
@@ -658,11 +538,13 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
         boolean result = false;
         try {
-            sendMessage(request);
+
+            // TODO
+            result = sendMessage(request);
             if (request.isNeedRsp()) {
                 addSocketRequest(request);
-                result = true;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -684,51 +566,21 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：发送消息 输入参数：@param message 输入参数：@throws
      * IOException 返回类型：void： 备注：
      */
-    private void sendMessage(SocketRequest request) throws IOException {
+    private boolean sendMessage(SocketRequest request) throws IOException {
         if (null == request) {
             throw new IOException();
         }
-
         // TODO
-//        this.tcpChannel.sendData(TcpMessageParser.TcpMsg2Bytes(request.getTcpMessage()));
+        return sendMessage(TcpMessageParser.socketRequest2Message(request));
     }
-
-//    @Override
-//    public void onSuccess(int msgId)
-//    {
-//        switch (msgId)
-//        {
-//            case MessageId.UPLOAD_MASS_LOCATIONS:
-//                // 盲区补传成功后，清除保存的位置信息
-//                LocationReportService.getInstance().clearUnreportedLocs();
-//                break;
-//            default:
-//                break;
-//        }
-//
-//    }
-//
-//    @Override
-//    public void onFailed(int msgId)
-//    {
-//        switch (msgId)
-//        {
-//            case MessageId.UPLOAD_MASS_LOCATIONS:
-//                break;
-//            default:
-//                break;
-//        }
-//
-//    }
-
 
     /**
      * 发送消息
      *
      * @param message message
      */
-    private void sendMessage(String message) {
-        connection.sendMessage(message);
+    private boolean sendMessage(String message) {
+        return connection.sendMessage(message);
     }
 
     /**

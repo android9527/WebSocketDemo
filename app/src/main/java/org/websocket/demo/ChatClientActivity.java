@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 
 import org.java_websocket.WebSocketImpl;
 import org.websocket.demo.proxy.ImpsConnection;
+import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
@@ -39,7 +40,10 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
     private static final int MESSAGE_SEND = MESSAGE_RECEIVE + 1;
 
-    private IConnection client;
+//    private IConnection client;
+
+
+    OkHttpWebSocketConnection client;
 
     private Handler handler = new Handler() {
         @Override
@@ -95,7 +99,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         client = OkHttpWebSocketConnection.instance(this);
         client.addImpsConnection(this);
         ScheduleTaskService.getInstance().init(this.getApplicationContext());
-        onClosed();
+//        onClosed();
     }
 
     @Override
@@ -111,18 +115,21 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
                 break;
 
             case R.id.btnBind:
-                BindRequest request = new BindRequest();
-                request.setDeviceid(DeviceUtil.getUniqueId(ChatClientActivity.this));
-                request.setSign(request.getSign());
-                sendMessage(gson.toJson(request));
+//                BindRequest request = new BindRequest();
+//                request.setDeviceid(DeviceUtil.getUniqueId(ChatClientActivity.this));
+//                request.setSign(request.getSign());
+//                sendMessage(gson.toJson(request));
+
+                ServiceProxy.getInstance(getApplicationContext()).startBindClient();
                 break;
             case R.id.btnClear:
                 etDetails.getText().clear();
                 break;
             case R.id.btnHeartbeat:
-                HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
-                heartbeatRequest.setSign(heartbeatRequest.getSign());
-                sendMessage(gson.toJson(heartbeatRequest));
+//                HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
+//                heartbeatRequest.setSign(heartbeatRequest.getSign());
+//                sendMessage(gson.toJson(heartbeatRequest));
+                ServiceProxy.getInstance(getApplicationContext()).sendHeartBeatRequest();
                 break;
         }
     }

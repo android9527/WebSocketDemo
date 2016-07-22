@@ -14,7 +14,7 @@ public class TimeoutHandler implements ITimerHandler {
     static HashMap<Short, String> requestMap = new HashMap<>();
 
     @Override
-    public void timeoutHandle(short sequenceNumber, int status) {
+    public void timeoutHandle(String sequenceNumber, int status) {
 
         SocketRequest request = WebSocketService.getService()
                 .getSocketRequest(sequenceNumber);
@@ -29,23 +29,23 @@ public class TimeoutHandler implements ITimerHandler {
             if (null == param) {
                 return;
             }
-            String action = requestMap.get(param.getMessageId());
+//            String action = requestMap.get(param.getMessageId());
 
             request.setNeedResend(false);
 
             Http.sendRequest(request);
 
-            if (action != null) {
-                Intent intent = new Intent();
-                intent.setAction(action);
-                intent.putExtra(Constant.SERVICE_RESPONSE_RESULT, status);
-                intent.putExtra(Constant.MESSAGE_BODY, request.getTcpMessage()
-                        .getBody());
-                WebSocketService.getService().sendBroadcast(intent);
-            }
-            LogUtil.d("TimeoutHandler",
-                    "requestID = " + param.getMessageId() + ",action="
-                            + action);
+//            if (action != null) {
+//                Intent intent = new Intent();
+//                intent.setAction(action);
+//                intent.putExtra(Constant.SERVICE_RESPONSE_RESULT, status);
+//                intent.putExtra(Constant.MESSAGE_BODY, request.getTcpMessage()
+//                        .getBody());
+//                WebSocketService.getService().sendBroadcast(intent);
+//            }
+//            LogUtil.d("TimeoutHandler",
+//                    "requestID = " + param.getMessageId() + ",action="
+//                            + action);
         } else if (status == Constant.REQUEST_SHUTDOWN) {
             // TODO
         }

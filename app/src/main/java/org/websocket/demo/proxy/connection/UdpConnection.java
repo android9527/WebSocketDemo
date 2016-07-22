@@ -68,8 +68,9 @@ public class UdpConnection extends BaseConnection {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public boolean sendMessage(String message) {
         // TODO
+        return super.sendMessage(message);
     }
 
     @Override

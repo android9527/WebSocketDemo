@@ -11,7 +11,7 @@ public interface IConnection {
 
     void disConnect();
 
-    void sendMessage(String message);
+    boolean sendMessage(String message);
 
     void addImpsConnection(ImpsConnection impsConnection);
 

@@ -49,8 +49,8 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
     }
 
     @Override
-    public void sendMessage(String message) {
-
+    public boolean sendMessage(String message) {
+        return false;
     }
 
     @Override
@@ -114,6 +114,7 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
      */
     @Override
     public void stopReConnect() {
+        reConnectCount = 0;
         try {
             ScheduleTaskService.getInstance()
                     .getScheduleTaskManager()
@@ -150,10 +151,9 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
         }
 
         /**
-         * 连接成功，置0
+         * 连接成功，stopReConnect
          */
         if (isConnected) {
-            reConnectCount = 0;
             stopReConnect();
         }
         // 连接断开

@@ -16,10 +16,6 @@ import org.websocket.demo.util.SPUtil;
 public class Http implements Runnable {
 
     private static final String TAG = "Http";
-    /**
-     * 超时时长
-     */
-    public static final int DEFAULT_TIMEOUT = 60 * 1000;
 
     /**
      * 当前http连接的请求对象
@@ -47,7 +43,7 @@ public class Http implements Runnable {
 
         if (null != mService) {
             LogUtil.d(TAG, "sendMesageToService:requestId = "
-                    + currentRequest.getParam().getMessageId());
+                    + currentRequest.getSequenceNumber());
 
             if (!mService.send(currentRequest)) {
                 ITimerHandler timerHandler = currentRequest.getParam()
@@ -58,11 +54,9 @@ public class Http implements Runnable {
                             Constant.REQUEST_SHUTDOWN);
                 }
 
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    LogUtil.d(TAG,
-                            "sendMesageToService Error, requestId:"
-                                    + currentRequest.getParam().getMessageId());
-                }
+                LogUtil.d(TAG,
+                        "sendMesageToService Error, requestId:"
+                                + currentRequest.getSequenceNumber());
             } else {
                 if (currentRequest.isNeedResend()) {
                     bRet = true;
@@ -97,16 +91,11 @@ public class Http implements Runnable {
 
         Http http = getFreeHttp();
 
-        if (http != null) {
-            request.setHttp(http);
-            // 设置http参数
-            http.currentRequest = request;
+        request.setHttp(http);
+        // 设置http参数
+        http.currentRequest = request;
 
-            // Thread t = new Thread(http, "sendRequest thread");
-            // t.start();
-
-            AsyncTaskExecutors.executeTask(http);
-        }
+        AsyncTaskExecutors.executeTask(http);
 
         return http;
     }
@@ -135,7 +124,7 @@ public class Http implements Runnable {
                     .getInstance()
                     .getScheduleTaskManager()
                     .startSchedule(callback,
-                            currentRequest.getParam().getTimeout() * 1000);
+                            currentRequest.getParam().getTimeout());
         }
     }
 
@@ -143,7 +132,9 @@ public class Http implements Runnable {
 
         @Override
         public long doSchedule() {
-
+            LogUtil.d(TAG,
+                    "Execute request timeout,requestID:"
+                            + currentRequest.getSequenceNumber());
             int timeout = currentRequest.getParam().getTimeout();
             currentRequest.addSendNum();
             // 重发超过限定次数，不再保存请求对象
@@ -155,19 +146,17 @@ public class Http implements Runnable {
             ITimerHandler timerHandler = currentRequest.getParam()
                     .getTimeHandler();
             if (null != timerHandler) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    LogUtil.d(TAG,
-                            "Execute request timeout,requestID:"
-                                    + currentRequest.getParam().getMessageId());
-                }
+                LogUtil.d(TAG,
+                        "Execute request timeout,requestID:"
+                                + currentRequest.getSequenceNumber());
 
                 timerHandler.timeoutHandle(currentRequest.getSequenceNumber(),
                         Constant.REQUEST_TIMEOUT);
             }
 
-            timeout = timeout * (currentRequest.getSendNum() + 1);
-            currentRequest.getParam().setTimeout(timeout);
-            return timeout * 1000;
+//            timeout = timeout * (currentRequest.getSendNum() + 1);
+//            currentRequest.getParam().setTimeout(timeout);
+            return timeout;
         }
     };
 }

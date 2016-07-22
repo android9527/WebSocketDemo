@@ -1,11 +1,16 @@
 package org.websocket.demo.proxy;
 
+import android.text.TextUtils;
+
+import com.google.gson.Gson;
+
 import org.websocket.demo.request.BaseRequest;
 
 public class TcpMessage
 {
     private BaseRequest request;
 
+    private Gson gson = new Gson();
     public TcpMessage() {
     }
 
@@ -15,13 +20,14 @@ public class TcpMessage
 
     public void setRequest(BaseRequest request) {
         this.request = request;
-        setSequenceId(Short.parseShort(request.getPkg_id()));
+        setSequenceId(request.getPkg_id());
+        setBody(gson.toJson(request));
     }
 
     /**
      * 消息id
      */
-    private short messageId = 0;
+//    private short messageId = 0;
 
     /**
      * 消息体属性,是否分包
@@ -31,29 +37,29 @@ public class TcpMessage
     /**
      * 消息体属性,消息体长度
      */
-    private short bodyLength = 0;
+    private int bodyLength = 0;
 
     /**
-     * 消息流水号
+     * 消息流水号 对应BaseRequest.pkg_id
      */
-    private short sequenceId = -1;
+    private String sequenceId = "";
 
     /**
      * 应答流水号(只有当消息为响应消息的时候才会有)
      */
-    private short answerSequenceId = -1;
+    private String answerSequenceId = "";
 
-    private byte[] body = new byte[0];
+    private String body = "";
 
-    public short getMessageId()
-    {
-        return messageId;
-    }
-
-    public void setMessageId(short messageId)
-    {
-        this.messageId = messageId;
-    }
+//    public short getMessageId()
+//    {
+//        return messageId;
+//    }
+//
+//    public void setMessageId(short messageId)
+//    {
+//        this.messageId = messageId;
+//    }
 
     public boolean isMultiMessage()
     {
@@ -70,17 +76,17 @@ public class TcpMessage
         return bodyLength;
     }
 
-    public void setBodyLength(short bodyLength)
+    public void setBodyLength(int bodyLength)
     {
         this.bodyLength = bodyLength;
     }
 
-    public short getSequenceId()
+    public String getSequenceId()
     {
         return sequenceId;
     }
 
-    public void setSequenceId(short sequenceId)
+    public void setSequenceId(String sequenceId)
     {
         this.sequenceId = sequenceId;
     }
@@ -88,7 +94,7 @@ public class TcpMessage
     /**
      * 应答流水号(只有当消息为响应消息的时候才会有)
      */
-    public short getAnswerSequenceId()
+    public String getAnswerSequenceId()
     {
         return answerSequenceId;
     }
@@ -96,22 +102,22 @@ public class TcpMessage
     /**
      * 应答流水号(只有当消息为响应消息的时候才会有)
      */
-    public void setAnswerSequenceId(short answerSequenceId)
+    public void setAnswerSequenceId(String answerSequenceId)
     {
         this.answerSequenceId = answerSequenceId;
     }
 
-    public byte[] getBody()
+    public String getBody()
     {
         return body;
     }
 
-    public void setBody(byte[] body)
+    public void setBody(String body)
     {
-        if (body != null)
+        if (!TextUtils.isEmpty(body))
         {
             this.body = body;
-            this.bodyLength = (short) body.length;
+            this.bodyLength = body.getBytes().length;
         }
     }
 }
