@@ -13,9 +13,11 @@ import android.widget.EditText;
 import com.google.gson.Gson;
 
 import org.java_websocket.WebSocketImpl;
+import org.websocket.demo.proxy.BaseHandler;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.TcpMessage;
+import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
@@ -36,38 +38,40 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
     private static final int MESSAGE_SEND = MESSAGE_RECEIVE + 1;
 
-//    private IConnection client;
+    private IConnection client;
+    private MyHandler handler;
 
+    private static final class MyHandler extends BaseHandler<ChatClientActivity> {
+        public MyHandler(ChatClientActivity activity) {
+            super(activity);
+        }
 
-    OkHttpWebSocketConnection client;
-
-    private Handler handler = new Handler() {
         @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
+        public void onHandleMessage(Message msg, ChatClientActivity activity) {
             switch (msg.what) {
                 case MESSAGE_CONNECTED:
-                    onConnected();
+                    activity.onConnected();
                     break;
                 case MESSAGE_CLOSED:
-                    onClosed();
+                    activity.onClosed();
                     break;
                 case MESSAGE_RECEIVE:
-                    etDetails.append("获取到服务器信息 " + msg.obj + "\n");
+                    activity.etDetails.append("获取到服务器信息 " + msg.obj + "\n");
                     break;
                 case MESSAGE_SEND:
-                    etDetails.append("发送数据到服务器 " + msg.obj + "\n");
+                    activity.etDetails.append("发送数据到服务器 " + msg.obj + "\n");
                     break;
             }
         }
-    };
+    }
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_client);
-
+        handler = new MyHandler(this);
 
 //        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
         startService(new Intent(ChatClientActivity.this, WebSocketService.class));
