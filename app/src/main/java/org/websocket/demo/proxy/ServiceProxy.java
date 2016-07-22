@@ -52,7 +52,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     /**
      * 消息请求队列
      */
-    private static Hashtable<Short, Request> reqQueue = new Hashtable<>();
+    private static Hashtable<Short, SocketRequest> reqQueue = new Hashtable<>();
 
     public ServiceProxy(Context context) {
         mContext = context.getApplicationContext();
@@ -248,7 +248,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
             param.setMessageId(msg.getMessageId());
             param.setTimeHandler(timeoutHandler);
-            Request request = new Request(param, msg);
+            SocketRequest request = new SocketRequest(param, msg);
             request.setNeedRsp(isNeedResponse);
             request.setNeedResend(isNeedResend);
             http = Http.sendRequest(request);
@@ -274,7 +274,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
             param.setMessageId(tcpMessage.getMessageId());
             param.setTimeHandler(timeoutHandler);
-            Request request = new Request(param, tcpMessage);
+            SocketRequest request = new SocketRequest(param, tcpMessage);
             request.setNeedRsp(isResponse);
             request.setNeedResend(isNeedResend);
             request.setSequenceNumber(sequence);
@@ -302,7 +302,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
             param.setMessageId(tcpMessage.getMessageId());
             param.setTimeHandler(timeoutHandler);
-            Request request = new Request(param, tcpMessage);
+            SocketRequest request = new SocketRequest(param, tcpMessage);
             request.setNeedRsp(true);
             request.setNeedResend(true);
             sequenceId = request.getSequenceNumber();
@@ -356,7 +356,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private void processRsp(TcpMessage tcpMessage) {
         LogUtil.d(TAG, "processRsp enter");
-        Request request = (Request) getSocketRequest(tcpMessage.getAnswerSequenceId());
+        SocketRequest request = (SocketRequest) getSocketRequest(tcpMessage.getAnswerSequenceId());
 
         if (null == request) {
             LogUtil.d(TAG, "processRsp request == null");
@@ -372,7 +372,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：获取包含指定消息的请求 输入参数：@param
      * socketMessage 输入参数：@return 返回类型：SocketRequest： 备注：
      */
-    public Request getSocketRequest(short sequenceId) {
+    public SocketRequest getSocketRequest(short sequenceId) {
         if (isEmptyReqQueue() || 0 == sequenceId) {
             return null;
         }
@@ -547,9 +547,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             LogUtil.d(TAG, "cancelAllRequest return");
             return;
         }
-        Enumeration<Request> elements = reqQueue.elements();
-        for (Enumeration<Request> element = elements; elements.hasMoreElements(); ) {
-            Request request = element.nextElement();
+        Enumeration<SocketRequest> elements = reqQueue.elements();
+        for (Enumeration<SocketRequest> element = elements; elements.hasMoreElements(); ) {
+            SocketRequest request = element.nextElement();
 
             if (null != request) {
                 Http http = request.getHttp();
@@ -629,7 +629,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：从请求队列中删除一个请求 输入参数:@param
      * socketRequest 返回类型：void 备注：
      */
-    public void delSocketRequest(Request request) {
+    public void delSocketRequest(SocketRequest request) {
         if (null == request) {
             return;
         }
@@ -651,7 +651,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     /**
      * 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
-    public boolean send(Request request) {
+    public boolean send(SocketRequest request) {
 
         if (!isConnected()) {
             return false;
@@ -673,7 +673,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：加入请求到队列中 输入参数：@param socketRequest
      * 返回类型：void： 备注：
      */
-    private void addSocketRequest(Request request) {
+    private void addSocketRequest(SocketRequest request) {
         if (null == request || null == reqQueue) {
             return;
         }
@@ -684,7 +684,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法描述：发送消息 输入参数：@param message 输入参数：@throws
      * IOException 返回类型：void： 备注：
      */
-    private void sendMessage(Request request) throws IOException {
+    private void sendMessage(SocketRequest request) throws IOException {
         if (null == request) {
             throw new IOException();
         }

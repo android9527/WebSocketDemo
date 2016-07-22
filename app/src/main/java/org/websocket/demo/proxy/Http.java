@@ -24,7 +24,7 @@ public class Http implements Runnable {
     /**
      * 当前http连接的请求对象
      */
-    private Request currentRequest = null;
+    private SocketRequest currentRequest = null;
 
     /**
      * HeartBeatService引用
@@ -75,7 +75,7 @@ public class Http implements Runnable {
     /**
      * 发送请求之前，先做检查
      */
-    private static boolean check(Request request) {
+    private static boolean check(SocketRequest request) {
         return request != null;
     }
 
@@ -89,7 +89,7 @@ public class Http implements Runnable {
     /**
      * 发送request请求
      */
-    public static synchronized Http sendRequest(Request request) {
+    public static synchronized Http sendRequest(SocketRequest request) {
         // 在发送请求之前，做一些检查工作，不通过则不发送请求
         if (!check(request)) {
             return null;

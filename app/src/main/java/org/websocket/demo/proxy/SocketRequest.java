@@ -3,7 +3,7 @@ package org.websocket.demo.proxy;
 /**
  * 类名称：Request 类描述：请求对象 修改时间：
  */
-public final class Request {
+public final class SocketRequest {
     /**
      * 发送次数
      */
@@ -50,7 +50,7 @@ public final class Request {
      * handler 输入参数：@param showCancel 输入参数：@param showTimeoutTip 输入参数：@param
      * timerHandler 输入参数：@param useWait 备注：
      */
-    public Request(RequestParam param, TcpMessage msg) {
+    public SocketRequest(RequestParam param, TcpMessage msg) {
         this.param = param;
         setTcpMessage(msg);
         if (sequence++ > MAX_SEQUENCE) {

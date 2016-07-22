@@ -6,7 +6,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import org.websocket.demo.proxy.Http;
-import org.websocket.demo.proxy.Request;
+import org.websocket.demo.proxy.SocketRequest;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
@@ -74,11 +74,11 @@ public class WebSocketService extends Service
         return mBinder;
     }
 
-    public void delSocketRequest(Request currentRequest) {
+    public void delSocketRequest(SocketRequest currentRequest) {
         serviceProxy.delSocketRequest(currentRequest);
     }
 
-    public Request getSocketRequest(short sequenceNumber) {
+    public SocketRequest getSocketRequest(short sequenceNumber) {
         return serviceProxy.getSocketRequest(sequenceNumber);
     }
 
@@ -148,7 +148,7 @@ public class WebSocketService extends Service
     /**
      * 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
-    public boolean send(Request request)
+    public boolean send(SocketRequest request)
     {
         return serviceProxy.send(request);
     }
