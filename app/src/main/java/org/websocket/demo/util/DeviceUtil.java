@@ -1,10 +1,10 @@
 package org.websocket.demo.util;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -205,5 +205,36 @@ public class DeviceUtil {
         }
     }
 
+    public static void setWifiNeverSleep(Context mContext) {
+        ContentResolver resolver = mContext.getContentResolver();
+//        if (Build.VERSION.SDK_INT < 17) {
+            int wifiSleepPolicy = Settings.System.getInt(resolver,
+                    android.provider.Settings.System.WIFI_SLEEP_POLICY,
+                    Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
+            System.out.println("---> 修改前的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
+
+            Settings.System.putInt(resolver,
+                    android.provider.Settings.System.WIFI_SLEEP_POLICY,
+                    Settings.System.WIFI_SLEEP_POLICY_NEVER);
+
+            wifiSleepPolicy = Settings.System.getInt(resolver,
+                    android.provider.Settings.System.WIFI_SLEEP_POLICY,
+                    Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
+            System.out.println("---> 修改后的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
+//        } else {
+//            int wifiSleepPolicy = Settings.System.getInt(resolver,
+//                    android.provider.Settings.Global.WIFI_SLEEP_POLICY,
+//                    android.provider.Settings.Global.WIFI_SLEEP_POLICY_DEFAULT);
+//            System.out.println("---> 17+修改前的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
+//            android.provider.Settings.Global.putInt(resolver,
+//                    android.provider.Settings.Global.WIFI_SLEEP_POLICY,
+//                    android.provider.Settings.Global.WIFI_SLEEP_POLICY_NEVER);
+//            wifiSleepPolicy = Settings.System.getInt(resolver,
+//                    android.provider.Settings.Global.WIFI_SLEEP_POLICY,
+//                    android.provider.Settings.Global.WIFI_SLEEP_POLICY_DEFAULT);
+//            System.out.println("---> 17+修改后的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
+//        }
+
+    }
 
 }

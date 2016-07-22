@@ -21,7 +21,7 @@ public class Constant {
     public static String secret_key = "123456";
 
     /**
-     * 连接超时时间
+     * Socket连接超时时间
      */
     public static final int DEFAULT_CONNECT_TIMEOUT = 30 * 1000;
 
@@ -30,12 +30,25 @@ public class Constant {
      */
     public static final int DEFAULT_TIMEOUT = 30 * 1000;
 
+    /**
+     * 消息超时重发次数
+     */
     public static final int DEFAULT_RESEND_COUNT = 3;
 
     /**
      * 心跳间隔
      */
     public static final int DEFAULT_HEARTBEAT_INTERVAL = 1000 * 30;
+
+    /**
+     * TCP重连间隔
+     */
+    public static final int DEFAULT_RECONNECT_INTERVAL = 1000 * 30;
+
+    /**
+     * TCP重连次数
+     */
+    public static final int DEFAULT_RECONNECT_COUNT = 3;
 
     /**
      * 请求成功
@@ -84,10 +97,17 @@ public class Constant {
 
 
     public static final class SPKey{
-        public static final String KEY_HEARTBEAT = "heartbeat";
+        public static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
+
+        public static final String KEY_RECONNECT_INTERVAL = "reconnect_interval";
+        public static final String KEY_RECONNECT_COUNT = "reconnect_count";
+
         public static final String KEY_MSG_TIMEOUT = "msg_timeout";
 
-        public static final String KEY_RESEND_COUNT = "resend_count";
+        public static final String KEY_RESEND_COUNT = "msg_resend_count";
+
+        public static final String KEY_MSG_RESENT_INTERVAL = "msg_resend_interval";
+
     }
 
 

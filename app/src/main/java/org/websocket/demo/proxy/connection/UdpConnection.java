@@ -39,8 +39,14 @@ public class UdpConnection extends BaseConnection {
         super(context);
     }
 
+
     @Override
-    public synchronized void connect(String url) {
+    public void connect(String url){
+        realConnect(url);
+    }
+
+    @Override
+    public synchronized void realConnect(String url) {
         if (isRun) {
             return;
         }
@@ -64,6 +70,11 @@ public class UdpConnection extends BaseConnection {
     @Override
     public void sendMessage(String message) {
         // TODO
+    }
+
+    @Override
+    public boolean isConnected() {
+        return isRun;
     }
 
     private class ReceiveThread extends Thread {

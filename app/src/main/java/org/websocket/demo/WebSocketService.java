@@ -6,11 +6,9 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import org.websocket.demo.proxy.Http;
-import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.Request;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.SocketRequest;
-import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
 
@@ -49,9 +47,9 @@ public class WebSocketService extends Service
     public void onCreate()
     {
         super.onCreate();
-        ScheduleTaskService.getInstance().init(this);
-        serviceProxy = ServiceProxy.getInstance(this);
         instance = this;
+        ScheduleTaskService.getInstance().init(this);
+        serviceProxy = new ServiceProxy(this);
 
     }
 

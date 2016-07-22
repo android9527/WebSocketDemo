@@ -2,13 +2,14 @@ package org.websocket.demo.proxy;
 
 import android.content.Context;
 import android.net.NetworkInfo;
-import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
 import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.HeartbeatRequest;
@@ -24,7 +25,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
+public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     private TimeoutHandler timeoutHandler = new TimeoutHandler();
 
     private static final String TAG = "serviceProxy";
@@ -36,42 +37,46 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
      */
     private NetworkConnectivityListener mNetworkConnectivityListener;
 
-
     /**
      * 网络切换事件
      */
     private static final int EVENT_NETWORK_STATE_CHANGED = 200;
 
-    ServiceHandler mServiceHandler;
+    private ServiceHandler mServiceHandler;
 
-
+    private IConnection connection;
 
     private Gson gson = new Gson();
+
+    private static ServiceProxy serviceProxy;
 
     /**
      * 消息请求队列
      */
     private static Hashtable<Short, SocketRequest> reqQueue = new Hashtable<>();
 
-    private ServiceProxy(Context context) {
+    public ServiceProxy(Context context) {
         mContext = context.getApplicationContext();
+        connection = OkHttpWebSocketConnection.instance(mContext);
         initListener(mContext);
     }
 
     private void initListener(Context context) {
-        mServiceHandler = new ServiceHandler();
+        mServiceHandler = new ServiceHandler(ServiceProxy.this);
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.registerHandler(mServiceHandler,
                 EVENT_NETWORK_STATE_CHANGED);
         mNetworkConnectivityListener.startListening(context);
-        OkHttpWebSocketConnection.instance(mContext).addImpsConnection(this);
+        connection.addImpsConnection(this);
     }
 
-    private static ServiceProxy serviceProxy;
-
-    public static synchronized ServiceProxy getInstance(Context context) {
+    public static ServiceProxy getInstance(Context context) {
         if (serviceProxy == null) {
-            serviceProxy = new ServiceProxy(context);
+            synchronized (ServiceProxy.class) {
+                if (serviceProxy == null) {
+                    serviceProxy = new ServiceProxy(context);
+                }
+            }
         }
         return serviceProxy;
     }
@@ -84,28 +89,24 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
     public boolean isConnected() {
 //        return VtdService.getService().isConnected();
         // TODO
-        return true;
+        return connection.isConnected();
     }
-
-
-    public void login() {
-    }
-
 
     /**
      * 类描述：监听网络连接回调Handler 修改时间：
      */
-    private final class ServiceHandler extends Handler {
-        public ServiceHandler() {
+    private static final class ServiceHandler extends BaseHandler<ServiceProxy> {
+        public ServiceHandler(ServiceProxy proxy) {
+            super(proxy);
         }
 
         @Override
-        public void handleMessage(Message msg) {
+        public void onHandleMessage(Message msg, ServiceProxy proxy) {
             LogUtil.d(TAG, "handleMessage");
 
             switch (msg.what) {
                 case EVENT_NETWORK_STATE_CHANGED:
-                    networkStateChanged();
+                    proxy.networkStateChanged();
                     break;
                 default:
             }
@@ -124,30 +125,17 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
         NetworkInfo networkInfo = mNetworkConnectivityListener.getNetworkInfo();
         NetworkInfo.State state = networkInfo.getState();
 
-        // Notify the connection that network type has changed. Note that this
-        // only work for connected connections, we need to reestablish if it's
-        // suspended.
         switch (state) {
-            case CONNECTED: {
-                try {
-                    if (!isConnected()) {
-                        // TODO
-//                        connect();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+            case CONNECTED:
+                if (!isConnected()) {
+                    connection.connect(Constant.URL);
                 }
                 break;
-            }
             case SUSPENDED:
-            case DISCONNECTED: {
+            case DISCONNECTED:
                 LogUtil.d(TAG, "DISCONNECTED");
-//                close();
-
-                // ReconnectNotify(false);
                 connectedNotify(false);
                 break;
-            }
             default:
                 break;
         }
@@ -175,14 +163,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
             stopHeartBeat();
 
             cancelAllRequest();
-        }else{
+        } else {
             startBindClient();
         }
-
-//        login();
-        //TODO
-
-        // bind();
     }
 
     @Override
@@ -190,11 +173,64 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
 
     }
 
-    private void startBindClient(){
+
+    /**
+     * 绑定打印机
+     */
+    private void startBindClient() {
         BindRequest request = new BindRequest();
         request.setDeviceid(DeviceUtil.getUniqueId(mContext));
         request.setSign(request.getSign());
         sendMessage(gson.toJson(request));
+    }
+
+    /**
+     * 取消重连
+     */
+    public void stopReBindClient() {
+        try {
+            ScheduleTaskService.getInstance()
+                    .getScheduleTaskManager()
+                    .stopSchedule(reBindCallback);
+            LogUtil.d(TAG, "Stop stopReBindClient...leave");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int reBindCount = 0;
+    /**
+     * 重新绑定打印机
+     */
+    private void startReBindClient() {
+        LogUtil.d(TAG, "startReBindClient()");
+        int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RESEND_COUNT, Constant.DEFAULT_RESEND_COUNT);
+        if (reBindCount >= count) {
+            return;
+        }
+        ScheduleTaskService.getInstance()
+                .getScheduleTaskManager()
+                .startSchedule(reBindCallback, getReconnectInterval());
+    }
+
+    ScheduleTask.Callback reBindCallback = new ScheduleTask.Callback() {
+        @Override
+        public long doSchedule() {
+            reBindCount++;
+            LogUtil.d(TAG, "重连次数 " + reBindCount);
+            startBindClient();
+            int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RECONNECT_COUNT,
+                    Constant.DEFAULT_RECONNECT_COUNT);
+            if (reBindCount >= count) {
+                return 0;
+            }
+            return getReconnectInterval();
+        }
+    };
+
+    public long getReconnectInterval() {
+        return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_MSG_RESENT_INTERVAL,
+                Constant.DEFAULT_RECONNECT_INTERVAL);
     }
 
     /**
@@ -456,7 +492,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
 //    }
 
     private long getHeartBeatInterval() {
-        return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT,
+        return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT_INTERVAL,
                 Constant.DEFAULT_HEARTBEAT_INTERVAL);
     }
 
@@ -475,7 +511,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
      * 设置心跳时间间隔
      */
     public void setHeartbeatInterval(long value) {
-        SPUtil.getInstance(mContext).save(Constant.SPKey.KEY_HEARTBEAT, value);
+        SPUtil.getInstance(mContext).save(Constant.SPKey.KEY_HEARTBEAT_INTERVAL, value);
     }
 
 
@@ -547,6 +583,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
     public void stopService() {
         clearAll();
 //        VtdService.getService().stopService();
+        connection.removeImpsConnection(this);
     }
 
     /**
@@ -615,23 +652,20 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
      * 方法描述：发送消息 输入参数：@param socketRequest 返回类型：void： 备注：
      */
     public boolean send(SocketRequest socketRequest) {
-        boolean result = false;
 
         if (!isConnected()) {
-            return result;
+            return false;
         }
+        boolean result = false;
         try {
             sendMessage(socketRequest);
-
             if (socketRequest.isNeedRsp()) {
                 addSocketRequest(socketRequest);
                 result = true;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-        socketRequest = null;
         return result;
     }
 
@@ -688,10 +722,18 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
 //    }
 
 
-    private void sendMessage(String message){
-        OkHttpWebSocketConnection.instance(mContext).sendMessage(message);
+    /**
+     * 发送消息
+     * @param message message
+     */
+    private void sendMessage(String message) {
+        connection.sendMessage(message);
     }
 
+    /**
+     * 消息解析
+     * @param message message
+     */
     private void parseMessage(String message) {
         try {
             JSONObject object = new JSONObject(message);
@@ -704,12 +746,13 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection{
 
                 // 绑定不成功
                 case MessageId.PKG_DEVICE_BIND:
-
+                    startReBindClient();
                     break;
 
                 // 绑定成功
                 case MessageId.PKG_DEVICE_BIND_ACK:
-                    if(object.has("respcd")){
+                    if (object.has("respcd")) {
+                        stopReBindClient();
                         startHeartBeat();
                     }
                     break;

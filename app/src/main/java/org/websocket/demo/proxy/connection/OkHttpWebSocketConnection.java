@@ -47,7 +47,7 @@ public class OkHttpWebSocketConnection extends BaseConnection {
     private WebSocketListener webSocketListener = new WebSocketListener() {
         @Override
         public void onOpen(okhttp3.ws.WebSocket webSocket, Response response) {
-            System.out.println("onOpen");
+            LogUtil.d(TAG, "onOpen");
             socket = webSocket;
             connecting = false;
             notifyListener(true);
@@ -56,22 +56,22 @@ public class OkHttpWebSocketConnection extends BaseConnection {
         @Override
         public void onFailure(IOException e, Response response) {
             e.printStackTrace();
-            System.out.println("onFailure");
+            LogUtil.d(TAG, "onFailure");
             socket = null;
             connecting = false;
             notifyListener(false);
             if (response != null) {
-                System.out.println("onFailure" + "   " + response.message());
+                LogUtil.d(TAG, "onFailure" + "   " + response.message());
             }
         }
 
         @Override
         public void onMessage(ResponseBody message) throws IOException {
-            System.out.println("onMessage");
+            LogUtil.d(TAG, "onMessage");
             connecting = false;
             if (message != null) {
                 String response = message.string();
-                System.out.println("onMessage" + response);
+                LogUtil.d(TAG, "onMessage" + response);
                 notifyGetMessage(response);
                 message.close();
             }
@@ -84,7 +84,7 @@ public class OkHttpWebSocketConnection extends BaseConnection {
 
         @Override
         public void onClose(int code, String reason) {
-            System.out.println("onClose" + reason);
+            LogUtil.d(TAG, "onClose" + reason);
             socket = null;
             connecting = false;
             notifyListener(false);
@@ -92,11 +92,7 @@ public class OkHttpWebSocketConnection extends BaseConnection {
     };
 
     @Override
-    public synchronized void connect(String url) {
-        if (connecting) {
-            LogUtil.w(TAG, "TCP is connecting return !");
-            return;
-        }
+    public synchronized void realConnect(String url) {
         OkHttpClient okHttpClient = OkHttp3Creator.instance(mContext).getOkHttp3Client();
         okhttp3.Request request = new okhttp3.Request.Builder().url(url).addHeader("Origin", url).
                 build();
@@ -131,6 +127,11 @@ public class OkHttpWebSocketConnection extends BaseConnection {
                 sendMsgToServer(message);
             }
         });
+    }
+
+    @Override
+    public boolean isConnected() {
+        return socket != null;
     }
 
     private synchronized void sendMsgToServer(final String message) {

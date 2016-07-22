@@ -68,6 +68,8 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_client);
 
+
+        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
         startService(new Intent(ChatClientActivity.this, WebSocketService.class));
 
         btnConnect = (Button) findViewById(R.id.btnConnect);
@@ -133,6 +135,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     protected void onDestroy() {
         super.onDestroy();
 //        client.disConnect();
+        client.removeImpsConnection(this);
     }
 
     private void onConnected() {

@@ -25,6 +25,8 @@ public class JavaWebSocketConnection extends BaseConnection {
 
     private static JavaWebSocketConnection instance;
 
+    private boolean isConnected = false;
+
     public JavaWebSocketConnection(Context context) {
         super(context);
     }
@@ -46,18 +48,21 @@ public class JavaWebSocketConnection extends BaseConnection {
     }
 
     @Override
-    public void connect(String url) {
-        if (connecting) {
-            LogUtil.w(TAG, "TCP is connecting return !");
-            return;
-        }
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    @Override
+    public void realConnect(String url) {
         try {
+            isConnected = false;
             Map<String, String> httpHeaders = new HashMap<>();
             httpHeaders.put("Origin", url);
             socket = new WebSocketClient(new URI(url), new Draft_17(), httpHeaders, Constant.DEFAULT_CONNECT_TIMEOUT) {
                 @Override
                 public void onOpen(final ServerHandshake serverHandshakeData) {
                     connecting = false;
+                    isConnected = true;
                     Log.e("wlf", "已经连接到服务器【" + getURI() + "】");
                     notifyListener(true);
                 }
@@ -65,6 +70,7 @@ public class JavaWebSocketConnection extends BaseConnection {
                 @Override
                 public void onMessage(final String message) {
                     connecting = false;
+                    isConnected = true;
                     Log.e("wlf", "获取到服务器信息【" + message + "】");
                     if (message != null) {
                         System.out.println("onMessage " + message);
@@ -75,6 +81,7 @@ public class JavaWebSocketConnection extends BaseConnection {
                 @Override
                 public void onClose(final int code, final String reason, final boolean remote) {
                     connecting = false;
+                    isConnected = false;
                     Log.e("wlf", "断开服务器连接【" + getURI() + "，状态码： " + code + "，断开原因：" + reason + "】" + remote);
                     notifyListener(false);
                 }
@@ -83,6 +90,7 @@ public class JavaWebSocketConnection extends BaseConnection {
                 public void onError(final Exception e) {
                     Log.e("wlf", "连接发生了异常【异常原因：" + e + "】");
                     connecting = false;
+                    isConnected = false;
                     notifyListener(false);
                 }
             };

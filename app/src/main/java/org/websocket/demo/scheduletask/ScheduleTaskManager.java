@@ -100,9 +100,6 @@ public class ScheduleTaskManager extends BroadcastReceiver implements
         public void run() {
             mWakeLock.acquire();
             try {
-
-                LogUtil.d("AndroidHeartBeatService", "sendHeartbeat");
-
                 Callback callback = mAlarm.mCallback;
                 long nextSchedule = callback.doSchedule();
                 if (nextSchedule <= 0) {

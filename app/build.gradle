@@ -29,4 +29,8 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'
 //    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     compile 'com.google.code.gson:gson:2.7'
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 }

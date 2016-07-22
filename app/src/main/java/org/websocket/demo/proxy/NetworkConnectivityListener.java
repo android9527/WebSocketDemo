@@ -59,8 +59,6 @@ public class NetworkConnectivityListener {
 
             if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION)
                     || !mListening) {
-                LogUtil.d(TAG, "onReceived() called with " + mState.toString()
-                        + " and " + intent);
                 return;
             }
 
@@ -73,9 +71,9 @@ public class NetworkConnectivityListener {
                 mState = State.CONNECTED;
             }
 
-            mNetworkInfo = (NetworkInfo) intent
+            mNetworkInfo = intent
                     .getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-            mOtherNetworkInfo = (NetworkInfo) intent
+            mOtherNetworkInfo = intent
                     .getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
 
             mReason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
@@ -89,12 +87,10 @@ public class NetworkConnectivityListener {
                     : mOtherNetworkInfo + " noConn="
                     + noConnectivity) + " mState="
                     + mState.toString());
-            LogUtil.d(TAG, "mState=" + mState.toString());
 
             for (Handler target : mHandlers.keySet()) {
                 Message message = Message.obtain(target, mHandlers.get(target));
                 target.sendMessage(message);
-                LogUtil.d(TAG, "sendMessage");
             }
         }
     }
