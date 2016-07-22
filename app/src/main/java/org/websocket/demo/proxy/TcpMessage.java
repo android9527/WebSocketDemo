@@ -1,7 +1,22 @@
 package org.websocket.demo.proxy;
 
+import org.websocket.demo.request.BaseRequest;
+
 public class TcpMessage
 {
+    private BaseRequest request;
+
+    public TcpMessage() {
+    }
+
+    public BaseRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(BaseRequest request) {
+        this.request = request;
+        setSequenceId(Short.parseShort(request.getPkg_id()));
+    }
 
     /**
      * 消息id

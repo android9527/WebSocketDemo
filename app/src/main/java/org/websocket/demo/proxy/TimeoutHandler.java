@@ -16,22 +16,15 @@ public class TimeoutHandler implements ITimerHandler {
     @Override
     public void timeoutHandle(short sequenceNumber, int status) {
 
-        SocketRequest socketRequest = WebSocketService.getService()
+        Request request = WebSocketService.getService()
                 .getSocketRequest(sequenceNumber);
 
-        if (null == socketRequest) {
+        if (null == request) {
             LogUtil.w("TimeoutHandler", "Request doesn't exist");
             return;
         }
 
-        if(!(socketRequest instanceof Request)){
-            LogUtil.w("TimeoutHandler", "!(socketRequest instanceof Request)");
-            return;
-        }
-
-        Request request = (Request) socketRequest;
         if (status == Constant.REQUEST_TIMEOUT) {
-
             RequestParam param = request.getParam();
             if (null == param) {
                 return;

@@ -32,12 +32,6 @@ public class Http implements Runnable {
     private static WebSocketService mService;
 
     /**
-     * 线程池
-     */
-//    private static final ExecutorService sExecutor = Executors
-//            .newFixedThreadPool(10);
-
-    /**
      * 设置HeartBeatService引用
      */
     public static void setMService(WebSocketService service) {
@@ -125,14 +119,12 @@ public class Http implements Runnable {
      * 取消请求操作
      */
     private void cancelRequest() {
-        if (Request.TYPE_TCP.equals(Request.getConnectType())) {
-            if (null != mService) {
-                try {
-                    mService.delSocketRequest(currentRequest);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    LogUtil.d("http:cancelRequest exception", e.getMessage());
-                }
+        if (null != mService) {
+            try {
+                mService.delSocketRequest(currentRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+                LogUtil.d("http:cancelRequest exception", e.getMessage());
             }
         }
     }
