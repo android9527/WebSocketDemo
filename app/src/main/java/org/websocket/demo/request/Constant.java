@@ -9,7 +9,7 @@ public class Constant {
 
     public static String userid = "1217856";
     public static String platform = "android";
-    public static String platform_ver = "6.0.0";
+    public static String platform_ver = android.os.Build.VERSION.RELEASE;
     public static String sdk = "pushcore";
 //    public static String apptype = "602";
 //    public static String secret_key = "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";

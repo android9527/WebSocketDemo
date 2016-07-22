@@ -1,14 +1,11 @@
 package org.websocket.demo.request;
 
-import android.util.Log;
-
 import org.websocket.demo.proxy.MessageId;
-import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.Utils;
 
 /**
  * Created by chenfeiyue on 16/7/18.
- * BindRequest
+ * BindRequest 绑定打印机请求数据体
  */
 public class BindRequest extends BaseRequest {
 
@@ -58,8 +55,6 @@ public class BindRequest extends BaseRequest {
 
     public String getSign() {
 
-//        apptype=412&deviceid=123456&pkg_id=1&pkg_type=04&platform=android&platform_ver=6.0.1&sdk=pushcore&userid=123abcdef
-
         String signature = "apptype=" + apptype + "&" +
                 "deviceid=" + deviceid + "&" +
                 "pkg_id=" + pkg_id + "&" +
@@ -69,10 +64,7 @@ public class BindRequest extends BaseRequest {
                 "sdk=" + sdk + "&" +
                 "userid=" + userid + Constant.secret_key;
 
-        LogUtil.d(TAG, "before signature " + signature);
         sign = Utils.toMd5(signature);
-        LogUtil.d(TAG, "after signature " + sign);
-
         return sign;
     }
 

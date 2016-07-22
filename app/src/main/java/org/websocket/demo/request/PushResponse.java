@@ -9,6 +9,7 @@ import org.websocket.demo.util.Utils;
 
 /**
  * Created by chenfeiyue on 16/7/18.
+ * 收到推送回复
  */
 public class PushResponse extends BaseRequest {
     /**
@@ -45,9 +46,7 @@ public class PushResponse extends BaseRequest {
                 + "pkg_type=" + pkg_type
                 + Constant.secret_key;
 
-        LogUtil.d("HeartbeatRequest", "before signature " + signature);
         sign = Utils.toMd5(signature);
-        LogUtil.d("HeartbeatRequest", "after signature " + sign);
         return sign;
     }
 

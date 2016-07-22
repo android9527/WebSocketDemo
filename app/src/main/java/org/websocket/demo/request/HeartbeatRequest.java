@@ -46,17 +46,12 @@ public class HeartbeatRequest extends BaseRequest {
 
     public String getSign() {
 
-//        apptype=412&deviceid=123456&pkg_id=1&pkg_type=04&platform=android&platform_ver=6.0.1&sdk=pushcore&userid=123abcdef
-
         String signature = "apptype=" + apptype + "&"
                 + "pkg_id=" + pkg_id + "&"
                 + "pkg_type=" + pkg_type
                 + Constant.secret_key;
 
-        LogUtil.d("HeartbeatRequest", "before signature " + signature);
         sign = Utils.toMd5(signature);
-        LogUtil.d("HeartbeatRequest", "after signature " + sign);
-
         return sign;
     }
 

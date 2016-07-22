@@ -137,7 +137,7 @@ public class OkHttpWebSocketConnection extends BaseConnection {
             socket.sendMessage(requestBody);
             notifySendMessage(message);
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
