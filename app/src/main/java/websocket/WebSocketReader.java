@@ -286,7 +286,7 @@ public class WebSocketReader extends Thread {
             if (mFrameHeader.mPayloadLen > 0) {
                framePayload = new byte[mFrameHeader.mPayloadLen];
                mFrameBuffer.position(mFrameHeader.mHeaderLen);
-               mFrameBuffer.get(framePayload, 0, (int) mFrameHeader.mPayloadLen);
+               mFrameBuffer.get(framePayload, 0, mFrameHeader.mPayloadLen);
             }
             mFrameBuffer.position(mFrameHeader.mTotalLen);
             mFrameBuffer.limit(oldPosition);
@@ -679,8 +679,8 @@ public class WebSocketReader extends Thread {
     	  if (DEBUG) Log.d(TAG, "run() : SocketException (" + e.toString() + ")");
     	  
     	  // wrap the exception and notify master
-    	  notify(new WebSocketMessage.ConnectionLost());;
-    	  
+    	  notify(new WebSocketMessage.ConnectionLost());
+
       } catch (Exception e) {
 
          if (DEBUG) Log.d(TAG, "run() : Exception (" + e.toString() + ")");

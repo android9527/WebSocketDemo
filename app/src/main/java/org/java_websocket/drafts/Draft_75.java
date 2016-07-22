@@ -192,7 +192,7 @@ public class Draft_75 extends Draft {
 		return ByteBuffer.allocate( INITIAL_FAMESIZE );
 	}
 
-	public ByteBuffer increaseBuffer( ByteBuffer full ) throws LimitExedeedException , InvalidDataException {
+	public ByteBuffer increaseBuffer( ByteBuffer full ) throws InvalidDataException {
 		full.flip();
 		ByteBuffer newbuffer = ByteBuffer.allocate( checkAlloc( full.capacity() * 2 ) );
 		newbuffer.put( full );

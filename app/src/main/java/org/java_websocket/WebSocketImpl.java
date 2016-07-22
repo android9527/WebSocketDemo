@@ -163,7 +163,6 @@ public class WebSocketImpl implements WebSocket {
 
         if (readystate != READYSTATE.NOT_YET_CONNECTED) {
             decodeFrames(socketBuffer);
-            ;
         } else {
             if (decodeHandshake(socketBuffer)) {
                 assert (tmpHandshakeBytes.hasRemaining() != socketBuffer.hasRemaining() || !socketBuffer.hasRemaining()); // the buffers will never have remaining bytes at the same time

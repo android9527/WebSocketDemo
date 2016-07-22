@@ -95,8 +95,6 @@ public class NetworkConnectivityListener {
         }
     }
 
-    ;
-
     public enum State {
         UNKNOWN,
 

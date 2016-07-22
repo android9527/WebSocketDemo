@@ -2,7 +2,7 @@ package org.websocket.demo.scheduletask;
 
 public interface ScheduleTask
 {
-    public interface Callback
+    interface Callback
     {
         /**
          * Called on heartbeat schedule.
@@ -11,7 +11,7 @@ public interface ScheduleTask
          * be called the next time. Return 0 or negative value indicates to stop
          * the schedule of this callback.
          */
-        public long doSchedule();
+        long doSchedule();
     }
 
     /**
@@ -21,12 +21,12 @@ public interface ScheduleTask
      * @param triggerTime The time(in milliseconds) until the operation
      *            will be executed the first time.
      */
-    public void startSchedule(Callback callback, long triggerTime);
+    void startSchedule(Callback callback, long triggerTime);
 
     /**
      * Stop scheduling a heartbeat operation.
      *
      * @param callback The operation will be stopped.
      */
-    public void stopSchedule(Callback callback);
+    void stopSchedule(Callback callback);
 }

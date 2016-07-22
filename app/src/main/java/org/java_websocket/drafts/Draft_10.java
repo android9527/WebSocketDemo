@@ -102,7 +102,7 @@ public class Draft_10 extends Draft {
 		assert ( payloadlengthbytes.length == sizebytes );
 
 		if( sizebytes == 1 ) {
-			buf.put( (byte) ( (byte) payloadlengthbytes[ 0 ] | ( mask ? (byte) -128 : 0 ) ) );
+			buf.put( (byte) ( payloadlengthbytes[ 0 ] | ( mask ? (byte) -128 : 0 ) ) );
 		} else if( sizebytes == 2 ) {
 			buf.put( (byte) ( (byte) 126 | ( mask ? (byte) -128 : 0 ) ) );
 			buf.put( payloadlengthbytes );
@@ -240,7 +240,7 @@ public class Draft_10 extends Draft {
 	}
 
 	@Override
-	public List<Framedata> translateFrame( ByteBuffer buffer ) throws LimitExedeedException , InvalidDataException {
+	public List<Framedata> translateFrame( ByteBuffer buffer ) throws InvalidDataException {
 		List<Framedata> frames = new LinkedList<Framedata>();
 		Framedata cur;
 
@@ -360,7 +360,7 @@ public class Draft_10 extends Draft {
 			byte[] maskskey = new byte[ 4 ];
 			buffer.get( maskskey );
 			for( int i = 0 ; i < payloadlength ; i++ ) {
-				payload.put( (byte) ( (byte) buffer.get( /*payloadstart + i*/) ^ (byte) maskskey[ i % 4 ] ) );
+				payload.put( (byte) ( buffer.get( /*payloadstart + i*/) ^ maskskey[ i % 4 ]) );
 			}
 		} else {
 			payload.put( buffer.array(), buffer.position(), payload.limit() );
