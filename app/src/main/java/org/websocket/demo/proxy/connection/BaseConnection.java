@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import org.websocket.demo.proxy.ImpsConnection;
+import org.websocket.demo.proxy.TcpMessage;
+import org.websocket.demo.proxy.TcpMessageParser;
 import org.websocket.demo.request.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
@@ -170,12 +172,17 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
      */
     public void notifyGetMessage(String response) {
         reConnectCount = 0;
+        final TcpMessage message = TcpMessageParser.string2TcpMsg(response);
+        if (null == message) {
+            LogUtil.w(TAG, "notifyGetMessage TcpMessage is null");
+        }
+
         if (impsConnections != null && impsConnections.size() > 0) {
             for (ImpsConnection impsConnection : impsConnections) {
-//                            impsConnection.receiveMsg(getMessage(response));
                 if (null == impsConnection)
                     continue;
-                impsConnection.receiveMsg(response);
+//                impsConnection.receiveMsg(response);
+                impsConnection.receiveMsg(message);
             }
         }
     }

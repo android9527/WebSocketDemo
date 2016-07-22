@@ -29,12 +29,10 @@ public class TimeoutHandler implements ITimerHandler {
             if (null == param) {
                 return;
             }
-//            String action = requestMap.get(param.getMessageId());
-
             request.setNeedResend(false);
-
             Http.sendRequest(request);
 
+//            String action = requestMap.get(param.getMessageId());
 //            if (action != null) {
 //                Intent intent = new Intent();
 //                intent.setAction(action);

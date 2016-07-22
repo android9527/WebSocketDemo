@@ -101,6 +101,7 @@ public class Http implements Runnable {
     }
 
     public void cancel() {
+        stopReSend();
         cancelRequest();
     }
 
@@ -118,6 +119,7 @@ public class Http implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         if (sendMessageToServer()) {
             ScheduleTaskService
@@ -126,6 +128,13 @@ public class Http implements Runnable {
                     .startSchedule(callback,
                             currentRequest.getParam().getTimeout());
         }
+    }
+
+    private void stopReSend() {
+        ScheduleTaskService
+                .getInstance()
+                .getScheduleTaskManager()
+                .stopSchedule(callback);
     }
 
     ScheduleTask.Callback callback = new ScheduleTask.Callback() {

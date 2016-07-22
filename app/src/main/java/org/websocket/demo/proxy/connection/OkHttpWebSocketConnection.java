@@ -1,7 +1,7 @@
 package org.websocket.demo.proxy.connection;
 
 import android.content.Context;
-import android.util.Log;
+import android.text.TextUtils;
 
 import org.websocket.demo.proxy.OkHttp3Creator;
 import org.websocket.demo.util.LogUtil;
@@ -22,7 +22,7 @@ import okio.Buffer;
  */
 public class OkHttpWebSocketConnection extends BaseConnection {
 
-    private static final String TAG = "WebSocketConnection";
+    private static final String TAG = "OkHttpWebSocketConnection";
     private static OkHttpWebSocketConnection instance;
     private okhttp3.ws.WebSocket socket;
 
@@ -53,18 +53,20 @@ public class OkHttpWebSocketConnection extends BaseConnection {
         @Override
         public void onFailure(IOException e, Response response) {
             e.printStackTrace();
-            LogUtil.d(TAG, "onFailure");
+            String reason = "";
+            if (response != null) {
+                reason = response.message();
+                response.close();
+            }
+            LogUtil.d(TAG, "onFailure   " + reason);
             socket = null;
             connecting = false;
             notifyListener(false);
-            if (response != null) {
-                LogUtil.d(TAG, "onFailure" + "   " + response.message());
-            }
+
         }
 
         @Override
         public void onMessage(ResponseBody message) throws IOException {
-            LogUtil.d(TAG, "onMessage");
             connecting = false;
             if (message != null) {
                 String response = message.string();
@@ -104,7 +106,7 @@ public class OkHttpWebSocketConnection extends BaseConnection {
             return;
         }
         try {
-            socket.close(1000, "closed by client");
+            socket.close(1001, "closed by client");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,12 +115,9 @@ public class OkHttpWebSocketConnection extends BaseConnection {
     @Override
     public boolean sendMessage(final String message) {
 
-        Log.e("ChatClientActivity", "send To Server " + message);
+        LogUtil.d(TAG, "send To Server " + message);
 
-        if (socket == null || message == null) {
-            return false;
-        }
-                return sendMsgToServer(message);
+        return !(!isConnected() || TextUtils.isEmpty(message)) && sendMsgToServer(message);
     }
 
     @Override
@@ -126,6 +125,12 @@ public class OkHttpWebSocketConnection extends BaseConnection {
         return socket != null;
     }
 
+
+    /**
+     * 发送数据到服务器
+     * @param message message
+     * @return true send
+     */
     private synchronized boolean sendMsgToServer(final String message) {
         try {
             RequestBody requestBody = RequestBody.create(okhttp3.ws.WebSocket.TEXT, message);

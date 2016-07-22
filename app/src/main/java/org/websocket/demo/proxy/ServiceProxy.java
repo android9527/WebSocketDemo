@@ -142,12 +142,12 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     @Override
     public void receiveMsg(TcpMessage msg) {
-
+        processRsp(msg);
     }
 
     @Override
     public void receiveMsg(String msg) {
-        parseMessage(msg);
+//        parseMessage(msg);
     }
 
     /**
@@ -216,11 +216,14 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                 .startSchedule(reBindCallback, getReconnectInterval());
     }
 
+    /**
+     * 重新绑定打印机Callback
+     */
     ScheduleTask.Callback reBindCallback = new ScheduleTask.Callback() {
         @Override
         public long doSchedule() {
             reBindCount++;
-            LogUtil.d(TAG, "重连次数 " + reBindCount);
+            LogUtil.d(TAG, "重新绑定打印机次数 " + reBindCount);
             startBindClient();
             int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RECONNECT_COUNT,
                     Constant.DEFAULT_RECONNECT_COUNT);
@@ -231,49 +234,29 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
     };
 
+    /**
+     * 获取重连间隔
+     *
+     * @return 重连间隔
+     */
     public long getReconnectInterval() {
         return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_MSG_RESENT_INTERVAL,
                 Constant.DEFAULT_RECONNECT_INTERVAL);
     }
 
     /**
-     * 发送无响应请求
+     * 发送请求
+     *
+     * @param tcpMessage     tcpMessage
+     * @param isNeedResponse 是否需要响应
+     * @param isNeedResend   是否需要重发
+     * @return Http
      */
-    public Http sendRequest(TcpMessage msg, boolean isNeedResponse,
+    public Http sendRequest(TcpMessage tcpMessage, boolean isNeedResponse,
                             boolean isNeedResend) {
         if (!isConnected()) {
             return null;
         }
-
-        Http http = null;
-        try {
-            RequestParam param = new RequestParam();
-            param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
-            param.setTimeHandler(timeoutHandler);
-            SocketRequest request = new SocketRequest(param, msg);
-            request.setNeedRsp(isNeedResponse);
-            request.setNeedResend(isNeedResend);
-            http = Http.sendRequest(request);
-        } catch (Exception e) {
-            e.printStackTrace();
-            http = null;
-        }
-
-        return http;
-    }
-
-
-    /**
-     * 发送无响应请求
-     */
-    public Http sendRequest(BaseRequest request, boolean isNeedResponse,
-                            boolean isNeedResend) {
-        if (!isConnected()) {
-            return null;
-        }
-
-        TcpMessage tcpMessage = new TcpMessage();
-        tcpMessage.setRequest(request);
         Http http;
         try {
             RequestParam param = new RequestParam();
@@ -291,21 +274,43 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         return http;
     }
 
+
+    /**
+     * 发送请求
+     *
+     * @param request        request
+     * @param isNeedResponse 是否需要响应
+     * @param isNeedResend   是否需要重发
+     * @return Http
+     */
+    public Http sendRequest(BaseRequest request, boolean isNeedResponse,
+                            boolean isNeedResend) {
+        if (!isConnected()) {
+            return null;
+        }
+
+        TcpMessage tcpMessage = new TcpMessage();
+        tcpMessage.setRequest(request);
+
+        return sendRequest(tcpMessage, isNeedResponse, isNeedResend);
+    }
+
     /**
      * 方法描述：处理响应消息 输入参数：@param socketMessage
      * 返回类型：void： 备注：
      */
     private void processRsp(TcpMessage tcpMessage) {
         LogUtil.d(TAG, "processRsp enter");
-        SocketRequest request = getSocketRequest(tcpMessage.getAnswerSequenceId());
+//        SocketRequest request = getSocketRequest(tcpMessage.getAnswerSequenceId());
+
+        SocketRequest request = getSocketRequest(tcpMessage.getSequenceId());
 
         if (null == request) {
             LogUtil.d(TAG, "processRsp request == null");
-            return;
+        } else {
+            request.getHttp().cancel();
         }
-        request.getHttp().cancel();
-
-        doResponse(tcpMessage);
+        parseMessage(tcpMessage.getBody());
 
     }
 
@@ -524,6 +529,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         if (isEmptyReqQueue() || TextUtils.isEmpty(sequenceNumber)) {
             return;
         }
+
+        LogUtil.d(TAG, "delete form requestQueue");
         reqQueue.remove(sequenceNumber);
     }
 
@@ -627,4 +634,5 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             e.printStackTrace();
         }
     }
+
 }

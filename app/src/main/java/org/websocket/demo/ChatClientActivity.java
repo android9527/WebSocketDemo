@@ -16,13 +16,9 @@ import org.java_websocket.WebSocketImpl;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.TcpMessage;
-import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
-import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.Constant;
-import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
-import org.websocket.demo.util.DeviceUtil;
 
 /**
  * @datetime 2016-02-16 09:28 GMT+8
@@ -73,7 +69,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         setContentView(R.layout.activity_chat_client);
 
 
-        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
+//        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
         startService(new Intent(ChatClientActivity.this, WebSocketService.class));
 
         btnConnect = (Button) findViewById(R.id.btnConnect);
@@ -99,7 +95,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         client = OkHttpWebSocketConnection.instance(this);
         client.addImpsConnection(this);
         ScheduleTaskService.getInstance().init(this.getApplicationContext());
-//        onClosed();
+        onClosed();
     }
 
     @Override
@@ -107,35 +103,21 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         switch (v.getId()) {
             case R.id.btnConnect:
                 client.connect(etAddress.getText().toString());
-
-//                connect();
                 break;
             case R.id.btnClose:
                 client.disConnect();
                 break;
 
             case R.id.btnBind:
-//                BindRequest request = new BindRequest();
-//                request.setDeviceid(DeviceUtil.getUniqueId(ChatClientActivity.this));
-//                request.setSign(request.getSign());
-//                sendMessage(gson.toJson(request));
-
                 ServiceProxy.getInstance(getApplicationContext()).startBindClient();
                 break;
             case R.id.btnClear:
                 etDetails.getText().clear();
                 break;
             case R.id.btnHeartbeat:
-//                HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
-//                heartbeatRequest.setSign(heartbeatRequest.getSign());
-//                sendMessage(gson.toJson(heartbeatRequest));
                 ServiceProxy.getInstance(getApplicationContext()).sendHeartBeatRequest();
                 break;
         }
-    }
-
-    private void sendMessage(String message) {
-        client.sendMessage(message);
     }
 
     @Override
