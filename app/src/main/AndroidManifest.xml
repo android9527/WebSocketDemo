@@ -10,12 +10,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
+    <permission android:name="com.qfpay.permission.PUSHCORE"/>
+    <uses-permission android:name="com.qfpay.permission.PUSHCORE"/>
     <application
-        android:allowBackup="true"
         android:name="org.websocket.demo.MyApplication"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
@@ -30,7 +32,14 @@
 
         </activity>
 
-        <service android:name="org.websocket.demo.WebSocketService"/>
+        <service
+            android:name="org.websocket.demo.WebSocketService"
+            android:exported="true"
+            android:permission="com.qfpay.permission.PUSHCORE">
+            <intent-filter>
+                <action android:name="org.websocket.demo.WebSocketService"></action>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

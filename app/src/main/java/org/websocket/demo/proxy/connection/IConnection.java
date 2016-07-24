@@ -17,6 +17,8 @@ public interface IConnection {
 
     void removeImpsConnection(ImpsConnection impsConnection);
 
+    void removeAllImpsConnection();
+
     boolean isConnected();
 
     void reConnect(String url);

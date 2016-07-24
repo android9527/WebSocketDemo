@@ -58,26 +58,37 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private static Hashtable<String, SocketRequest> reqQueue = new Hashtable<>();
 
-    public ServiceProxy(Context context) {
+    public ServiceProxy() {
+//        mContext = context.getApplicationContext();
+//        ScheduleTaskService.getInstance().init(mContext);
+//        connection = OkHttpWebSocketConnection.instance(mContext);
+//        initListener(mContext);
+    }
+
+    public void init(Context context) {
+        if (mContext != null) {
+            return;
+        }
         mContext = context.getApplicationContext();
+        ScheduleTaskService.getInstance().init(mContext);
         connection = OkHttpWebSocketConnection.instance(mContext);
         initListener(mContext);
     }
 
     private void initListener(Context context) {
-//        mServiceHandler = new ServiceHandler(ServiceProxy.this);
-//        mNetworkConnectivityListener = new NetworkConnectivityListener();
-//        mNetworkConnectivityListener.registerHandler(mServiceHandler,
-//                EVENT_NETWORK_STATE_CHANGED);
-//        mNetworkConnectivityListener.startListening(context);
+        mServiceHandler = new ServiceHandler(ServiceProxy.this);
+        mNetworkConnectivityListener = new NetworkConnectivityListener();
+        mNetworkConnectivityListener.registerHandler(mServiceHandler,
+                EVENT_NETWORK_STATE_CHANGED);
+        mNetworkConnectivityListener.startListening(context);
         connection.addImpsConnection(this);
     }
 
-    public static ServiceProxy getInstance(Context context) {
+    public static ServiceProxy getInstance() {
         if (serviceProxy == null) {
             synchronized (ServiceProxy.class) {
                 if (serviceProxy == null) {
-                    serviceProxy = new ServiceProxy(context);
+                    serviceProxy = new ServiceProxy();
                 }
             }
         }
@@ -116,19 +127,22 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法名称：networkStateChanged 方法描述：网络状态改变时回被调用 输入参数： 返回类型：void： 备注：
      */
     private void networkStateChanged() {
-        if (mNetworkConnectivityListener == null) {
+        if (null == mNetworkConnectivityListener) {
             LogUtil.d(TAG, "networkStateChanged: return");
-
             return;
         }
         NetworkInfo networkInfo = mNetworkConnectivityListener.getNetworkInfo();
+
+        if (null == networkInfo) {
+            LogUtil.d(TAG, "networkInfo = null");
+            return;
+        }
+
         NetworkInfo.State state = networkInfo.getState();
 
         switch (state) {
             case CONNECTED:
-                if (!isConnected()) {
-                    connection.connect(Constant.URL);
-                }
+                connect();
                 break;
             case SUSPENDED:
             case DISCONNECTED:
@@ -167,6 +181,15 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     @Override
     public void sendedMessage(String msg) {
 
+    }
+
+    /**
+     * 连接服务器
+     */
+    public void connect() {
+        if (!isConnected()) {
+            connection.connect(Constant.URL);
+        }
     }
 
 
@@ -290,7 +313,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 返回类型：void： 备注：
      */
     private void processRsp(TcpMessage tcpMessage) {
-        LogUtil.d(TAG, "processRsp enter");
 //        SocketRequest request = getSocketRequest(tcpMessage.getAnswerSequenceId());
 
         SocketRequest request = getSocketRequest(tcpMessage.getSequenceId());
@@ -373,8 +395,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 取消所以请求
      */
     public void cancelAllRequest() {
+        LogUtil.d(TAG, "cancelAllRequest");
         if (this.isEmptyReqQueue()) {
-            LogUtil.d(TAG, "cancelAllRequest return");
             return;
         }
         Enumeration<SocketRequest> elements = reqQueue.elements();
@@ -411,9 +433,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 方法名称：stopService 方法描述：停止服务 输入参数： 返回类型：void： 备注：
      */
     public void stopService() {
+        connection.removeAllImpsConnection();
         clearAll();
-//        VtdService.getService().stopService();
-        connection.removeImpsConnection(this);
+        connection.disConnect();
     }
 
     /**
@@ -421,20 +443,19 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private void clearAll() {
         // 清除缓存数据
-
         cancelAllRequest();
         ScheduleTaskService.getInstance().shutdown();
 //        stopHeartBeat();
+        stopNetworkListener();
+    }
 
+    private void stopNetworkListener() {
         if (null != mNetworkConnectivityListener) {
             LogUtil.d(TAG, "unregisterHandler");
             mNetworkConnectivityListener.unregisterHandler(mServiceHandler);
             mNetworkConnectivityListener.stopListening();
             mNetworkConnectivityListener = null;
         }
-        // TODO
-//        close();
-
     }
 
     @Override

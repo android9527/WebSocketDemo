@@ -8,7 +8,6 @@ import android.os.IBinder;
 import org.websocket.demo.proxy.Http;
 import org.websocket.demo.proxy.SocketRequest;
 import org.websocket.demo.proxy.ServiceProxy;
-import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
 
 
@@ -43,9 +42,9 @@ public class WebSocketService extends Service {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        ScheduleTaskService.getInstance().init(this);
-        serviceProxy = ServiceProxy.getInstance(this);
-
+        LogUtil.d(TAG, "WebSocketService onCreate()");
+        serviceProxy = ServiceProxy.getInstance();
+        serviceProxy.init(instance);
     }
 
     /**
@@ -96,6 +95,11 @@ public class WebSocketService extends Service {
         super.onDestroy();
         LogUtil.d(TAG, "onDestroy ...... ");
         // TODO
+        if (null != serviceProxy) {
+            serviceProxy.stopService();
+        }
+
+        startService(new Intent(WebSocketService.this, WebSocketService.class));
     }
 
     /**
@@ -117,6 +121,8 @@ public class WebSocketService extends Service {
         // TODO
 //        connect(false);
 //        return super.onStartCommand(intent, flags, startId);
+
+//        serviceProxy.connect();
         return START_REDELIVER_INTENT;
     }
 

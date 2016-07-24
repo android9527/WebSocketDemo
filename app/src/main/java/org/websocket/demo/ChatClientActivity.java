@@ -72,7 +72,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_client);
         handler = new MyHandler(this);
-
+        ServiceProxy.getInstance().init(this);
 //        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
         startService(new Intent(ChatClientActivity.this, WebSocketService.class));
 
@@ -113,13 +113,13 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
                 break;
 
             case R.id.btnBind:
-                ServiceProxy.getInstance(this).startBindClient();
+                ServiceProxy.getInstance().startBindClient();
                 break;
             case R.id.btnClear:
                 etDetails.getText().clear();
                 break;
             case R.id.btnHeartbeat:
-                ServiceProxy.getInstance(this).sendHeartBeatRequest();
+                ServiceProxy.getInstance().sendHeartBeatRequest();
                 break;
         }
     }
