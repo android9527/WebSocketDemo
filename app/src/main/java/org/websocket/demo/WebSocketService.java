@@ -12,11 +12,11 @@ import org.websocket.demo.util.LogUtil;
 
 
 /**
- * 类名称：VtdService 类描述：通讯服务服务 修改时间：
+ * 类名称：WebSocketService 类描述：通讯服务服务 修改时间：
  */
 public class WebSocketService extends Service {
 
-    static final String TAG = "VtdService";
+    static final String TAG = "WebSocketService";
 
     /**
      * mBinder

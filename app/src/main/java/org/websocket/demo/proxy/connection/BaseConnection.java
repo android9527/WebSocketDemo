@@ -53,9 +53,7 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
     @Override
     public void removeAllImpsConnection() {
         if (impsConnections != null && impsConnections.size() > 0) {
-            for (ImpsConnection impsConnection : impsConnections) {
-                impsConnections.remove(impsConnection);
-            }
+            impsConnections.clear();
         }
     }
 
