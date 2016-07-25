@@ -6,9 +6,9 @@ import android.text.TextUtils;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.proxy.TcpMessageParser;
-import org.websocket.demo.util.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
 
@@ -24,9 +24,9 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
 
     public boolean connecting = false;
 
-    public String address;
-
     public ArrayList<ImpsConnection> impsConnections = new ArrayList<>();
+
+    public boolean needReConnect = true;
 
     /**
      * 标记重连次数
@@ -64,7 +64,6 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
 
     @Override
     public void connect(String url) {
-        address = url;
         if (connecting) {
             LogUtil.w(TAG, "TCP is connecting return !");
             return;
@@ -74,11 +73,12 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
             LogUtil.w(TAG, "TCP is connected !");
             return;
         }
-        realConnect(address);
+        realConnect(url);
     }
 
     @Override
-    public void disConnect() {
+    public void disConnect(boolean needReConnect) {
+        this.needReConnect = needReConnect;
         close();
     }
 
@@ -91,6 +91,7 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
     public long doSchedule() {
         reConnectCount++;
         LogUtil.d(TAG, "重连次数 " + reConnectCount);
+        String address = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL);
         connect(address);
         int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RECONNECT_COUNT,
                 Constant.DEFAULT_RECONNECT_COUNT);
@@ -111,7 +112,6 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
             return;
         }
         LogUtil.w(TAG, "reConnect ---> " + url);
-        address = url;
         ScheduleTaskService.getInstance()
                 .getScheduleTaskManager()
                 .startSchedule(this, getReconnectInterval());
@@ -151,7 +151,7 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
             for (ImpsConnection impsConnection : impsConnections) {
                 if (null == impsConnection)
                     continue;
-                impsConnection.connectedNotify(isConnected);
+                impsConnection.connectedNotify(isConnected, needReConnect);
             }
         }
 
@@ -162,7 +162,8 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
             stopReConnect();
         }
         // 连接断开
-        else {
+        else if (this.needReConnect) {
+            String address = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL);
             reConnect(address);
         }
 

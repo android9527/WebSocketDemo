@@ -29,8 +29,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
         </activity>
+
+        <activity android:name="org.websocket.demo.SettingActivity"
+            />
 
         <service
             android:name="org.websocket.demo.WebSocketService"
@@ -43,13 +45,13 @@
 
         <service
             android:name="com.gprinter.service.GpPrintService"
-            android:label="GpPrintService"
-            android:process=":remote"
             android:enabled="true"
             android:exported="true"
+            android:label="GpPrintService"
+            android:process=":remote"
             >
             <intent-filter>
-                <action android:name="com.gprinter.aidl.GpPrintService" />
+                <action android:name="com.gprinter.aidl.GpPrintService"/>
             </intent-filter>
         </service>
     </application>

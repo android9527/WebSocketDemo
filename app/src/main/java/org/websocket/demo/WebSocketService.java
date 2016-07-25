@@ -132,10 +132,8 @@ public class WebSocketService extends Service {
             LogUtil.d(TAG, "onStartCommand service restart by System");
         }
         // TODO
-//        connect(false);
-//        return super.onStartCommand(intent, flags, startId);
 
-//        serviceProxy.connect();
+        serviceProxy.connect();
         return START_REDELIVER_INTENT;
     }
 

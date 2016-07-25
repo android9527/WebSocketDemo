@@ -2,6 +2,7 @@ package org.websocket.demo.util;
 
 /**
  * Created by chenfeiyue on 16/7/18.
+ * Constant
  */
 public class Constant {
 
@@ -11,14 +12,17 @@ public class Constant {
     public static String platform = "android";
     public static String platform_ver = android.os.Build.VERSION.RELEASE;
     public static String sdk = "pushcore";
-//    public static String apptype = "602";
+//    public static String app_type = "602";
 //    public static String secret_key = "hBnZahNgjWEG7AAvHXes5oK1StGVj7yA";
 //    public static String URL = "ws://172.100.101.106:9997";
 
 
     public static String URL = "ws://push.qfpay.com";
-    public static String apptype = "601";
+    public static String app_type = "601";
     public static String secret_key = "123456";
+
+
+    public static String print_device_id = "d9ef9a33c1b84b5f8c3799530a56d919";
 
     public static short MESSAGE_MAX_LENGTH = 10 * 1024;
 
@@ -30,7 +34,7 @@ public class Constant {
     /**
      * 消息读取超时时间
      */
-    public static final int DEFAULT_TIMEOUT = 10 * 1000;
+    public static final int DEFAULT_TIMEOUT = 30 * 1000;
 
     /**
      * 消息超时重发次数
@@ -103,7 +107,7 @@ public class Constant {
     public static final String DEFAULT_PRINT_PORT = "9100";
 
 
-    public static final class SPKey{
+    public static final class SPKey {
         public static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
 
         public static final String KEY_RECONNECT_INTERVAL = "reconnect_interval";
@@ -124,6 +128,26 @@ public class Constant {
          * 打印机端口
          */
         public static final String KEY_PRINT_PORT = "print_port";
+
+
+        /**
+         * user_id
+         */
+        public static final String KEY_USER_ID = "user_id";
+
+        public static final String KEY_PUSH_URL = "push_url";
+
+        /**
+         * app_type
+         */
+        public static final String KEY_APP_TYPE = "app_type";
+
+        /**
+         * app_type
+         */
+        public static final String KEY_SECRET_KEY = "secret_key";
+
+        public static final String KEY_PRINT_DEVICE_ID = "print_device_id";
     }
 
 

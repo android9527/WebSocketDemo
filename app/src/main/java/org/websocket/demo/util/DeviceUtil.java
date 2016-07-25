@@ -56,7 +56,7 @@ public class DeviceUtil {
 
 
         // 取打印机设备号
-        return "d9ef9a33c1b84b5f8c3799530a56d919";
+        return SPUtil.getInstance(context).getString(Constant.SPKey.KEY_PRINT_DEVICE_ID, Constant.print_device_id);
 //        if (context == null) {
 //            return "";
 //        }

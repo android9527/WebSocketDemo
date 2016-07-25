@@ -22,33 +22,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Spinner
-                android:id="@+id/spDraft"
+            <EditText
+                android:id="@+id/etAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
-
-            <!-- ws://192.168.1.104:80/JSR356-WebSocket/websocket/ -->
-            <!-- ws://192.168.1.104:8887 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/etAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4"
-                    android:text=""/>
-
-                <Spinner
-                    android:id="@+id/spAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:visibility="gone"/>
-            </LinearLayout>
+                android:text=""/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -66,6 +44,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="断开"/>
+
+                <Button
+                    android:id="@+id/btnSetting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设置"/>
             </LinearLayout>
 
             <LinearLayout

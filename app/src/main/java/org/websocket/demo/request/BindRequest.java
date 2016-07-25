@@ -30,7 +30,7 @@ public class BindRequest extends BaseRequest {
 
     private static final String TAG = "BindRequest";
     private String pkg_type = MessageId.PKG_DEVICE_BIND;
-    private String apptype = Constant.apptype;
+    private String apptype = Constant.app_type;
     private String sign;
     private String userid = Constant.userid;
     private String deviceid = "";

@@ -1,6 +1,6 @@
 package org.websocket.demo.proxy;
 
-import org.websocket.demo.AsyncTaskExecutors;
+import org.websocket.demo.util.AsyncTaskExecutors;
 import org.websocket.demo.WebSocketService;
 import org.websocket.demo.util.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;

@@ -9,7 +9,7 @@ import org.websocket.demo.proxy.ImpsConnection;
 public interface IConnection {
     void connect(String url);
 
-    void disConnect();
+    void disConnect(boolean needReConnect);
 
     boolean sendMessage(String message);
 

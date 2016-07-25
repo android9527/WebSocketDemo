@@ -18,7 +18,7 @@ public class PushResponse extends BaseRequest {
      */
 
     private String pkg_type = MessageId.PKG_DEVICE_PUSH_ACK;
-    private String apptype = Constant.apptype;
+    private String apptype = Constant.app_type;
     private String sign;
     private String msgid;
     private String arrival_time = System.currentTimeMillis() / 1000 + "";

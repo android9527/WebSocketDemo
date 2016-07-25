@@ -11,20 +11,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
+import org.websocket.demo.proxy.connection.PrintConnection;
 import org.websocket.demo.request.BaseRequest;
 import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.request.PushResponse;
+import org.websocket.demo.scheduletask.ScheduleTask;
+import org.websocket.demo.scheduletask.ScheduleTaskService;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.DeviceUtil;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
-import org.websocket.demo.util.Constant;
-import org.websocket.demo.scheduletask.ScheduleTask;
-import org.websocket.demo.scheduletask.ScheduleTaskService;
 
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     private TimeoutHandler timeoutHandler = new TimeoutHandler();
@@ -53,16 +55,25 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     private static ServiceProxy serviceProxy;
 
+
+    // 打印队列
+    private LinkedBlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
+
     /**
      * 消息请求队列
      */
     private static Hashtable<String, SocketRequest> reqQueue = new Hashtable<>();
 
+    /**
+     * 打印线程
+     */
+    private PrintThread printThread;
+
     public ServiceProxy() {
-//        mContext = context.getApplicationContext();
-//        ScheduleTaskService.getInstance().init(mContext);
-//        connection = OkHttpWebSocketConnection.instance(mContext);
-//        initListener(mContext);
+    }
+
+    public LinkedBlockingQueue<String> getBlockingQueue() {
+        return blockingQueue;
     }
 
     public void init(Context context) {
@@ -73,6 +84,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         ScheduleTaskService.getInstance().init(mContext);
         connection = OkHttpWebSocketConnection.instance(mContext);
         initListener(mContext);
+        PrintConnection.getInstance().init(mContext);
     }
 
     private void initListener(Context context) {
@@ -147,7 +159,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             case SUSPENDED:
             case DISCONNECTED:
                 LogUtil.d(TAG, "DISCONNECTED");
-                connectedNotify(false);
+
+                // TODO
+                connectedNotify(false, false);
                 break;
             default:
                 break;
@@ -168,14 +182,13 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 当连接到服务器会回调该方法
      */
     @Override
-    public void connectedNotify(boolean status) {
+    public void connectedNotify(boolean status, boolean needReConnect) {
         LogUtil.d(TAG, "connectedNotify:" + "ConnectStatus:" + status);
         if (status) {
             startBindClient();
         } else {
 //            ScheduleTaskService.getInstance().shutdown();
-            stopHeartBeat();
-            cancelAllRequest();
+            disConnect(needReConnect);
         }
     }
 
@@ -184,12 +197,21 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     }
 
+
+    public void disConnect(boolean needReConnect) {
+        connection.disConnect(needReConnect);
+        stopPrintThread();
+        PrintConnection.getInstance().disConnect();
+    }
+
+
     /**
      * 连接服务器
      */
     public void connect() {
         if (!isConnected()) {
-            connection.connect(Constant.URL);
+            String pushUrl = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL);
+            connection.connect(pushUrl);
         }
     }
 
@@ -199,7 +221,13 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     public void startBindClient() {
         BindRequest request = new BindRequest();
+
+        String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type);
+        request.setUserid(SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_USER_ID, Constant.userid));
+        request.setApptype(appType);
         request.setDeviceid(DeviceUtil.getUniqueId(mContext));
+        Constant.secret_key = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key);
+
         request.setSign(request.getSign());
         sendRequest(request, true/*, true*/);
     }
@@ -385,6 +413,10 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         try {
             // 构造心跳请求
             HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
+            String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type);
+            String secretKey = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key);
+            heartbeatRequest.setApptype(appType);
+            Constant.secret_key = secretKey;
             heartbeatRequest.setSign(heartbeatRequest.getSign());
             sendRequest(heartbeatRequest, false);
         } catch (Exception e) {
@@ -436,7 +468,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     public void stopService() {
         connection.removeAllImpsConnection();
         clearAll();
-        connection.disConnect();
+        connection.disConnect(false);
+//        PrintConnection.getInstance().shutdown();
     }
 
     /**
@@ -580,10 +613,18 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                 // 收到推送
                 case MessageId.PKG_DEVICE_PUSH:
                     if (object.has("msg_id")) {
-                        PushResponse response = new PushResponse();
-                        response.setMsgid(object.getString("msg_id"));
-                        response.setSign(response.getSign());
-                        sendMessage(gson.toJson(response));
+                        sendPushResponse(object);
+                        if (object.has("msg")) {
+                            String msg = object.getString("msg");
+                            if (!TextUtils.isEmpty(msg)) {
+                                try {
+                                    blockingQueue.put(msg);
+                                    connectPrint();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
                     }
                     break;
                 default:
@@ -593,6 +634,74 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * 发送推送响应
+     *
+     * @param object object
+     * @throws JSONException
+     */
+    private void sendPushResponse(JSONObject object) throws JSONException {
+        PushResponse response = new PushResponse();
+        response.setMsgid(object.getString("msg_id"));
+        String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type);
+        String secretKey = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key);
+        response.setApptype(appType);
+        Constant.secret_key = secretKey;
+        response.setSign(response.getSign());
+        sendMessage(gson.toJson(response));
+    }
+
+
+    /**
+     * 连接打印机
+     */
+    public void connectPrint() {
+        if (mContext == null) {
+            LogUtil.d(TAG, "mContext == null");
+            return;
+        }
+        PrintConnection.getInstance().connect();
+    }
+
+
+    /**
+     * 打印队列里面的数据
+     */
+    public void printMsg() throws InterruptedException {
+        if (!checkEnvironment())
+            return;
+        // 如果队列为空则阻塞
+        String text = blockingQueue.take();
+
+        // TODO
+//            if (TextUtils.isEmpty(text)) {
+//                return;
+//            }
+        boolean success = PrintConnection.getInstance().printText(text);
+        if (!success) {
+            // TODO
+//            blockingQueue.put(text);
+        }
+    }
+
+    public void startPrintThread() {
+        if (mContext == null || printThread == null || !printThread.isAlive()) {
+            printThread = new PrintThread();
+            printThread.connect();
+        }
+    }
+
+    public void stopPrintThread() {
+        if (printThread != null) {
+            printThread.disConnect();
+        }
+    }
+
+    private boolean checkEnvironment() {
+        return mContext != null;
     }
 
 }

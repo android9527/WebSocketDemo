@@ -24,6 +24,7 @@ import org.java_websocket.drafts.Draft_75;
 import org.java_websocket.drafts.Draft_76;
 import org.websocket.demo.proxy.HttpLoggingInterceptor;
 import org.websocket.demo.request.BindRequest;
+import org.websocket.demo.util.AsyncTaskExecutors;
 import org.websocket.demo.util.DeviceUtil;
 
 import java.io.IOException;
@@ -53,7 +54,6 @@ import okio.Buffer;
 public class ChatClientActivity1 extends AppCompatActivity implements OnClickListener {
 
     private ScrollView svChat;
-    private Spinner spDraft;
     private EditText etAddress;
     private Spinner spAddress;
     private Button btnConnect;
@@ -189,9 +189,7 @@ public class ChatClientActivity1 extends AppCompatActivity implements OnClickLis
         setContentView(R.layout.activity_chat_client);
         init();
         svChat = (ScrollView) findViewById(R.id.svChat);
-        spDraft = (Spinner) findViewById(R.id.spDraft);
         etAddress = (EditText) findViewById(R.id.etAddress);
-        spAddress = (Spinner) findViewById(R.id.spAddress);
         btnConnect = (Button) findViewById(R.id.btnConnect);
         btnClose = (Button) findViewById(R.id.btnClose);
         etDetails = (EditText) findViewById(R.id.etDetails);
@@ -204,27 +202,6 @@ public class ChatClientActivity1 extends AppCompatActivity implements OnClickLis
                 ("WebSocket协议Draft_10", new Draft_10()), new DraftInfo("WebSocket协议Draft_76", new Draft_76()), new
                 DraftInfo("WebSocket协议Draft_75", new Draft_75())};// 所有连接协议
         selectDraft = draftInfos[0];// 默认选择第一个连接协议
-
-        ArrayAdapter<DraftInfo> draftAdapter = new ArrayAdapter<DraftInfo>(this, android.R.layout
-                .simple_spinner_item, draftInfos);
-        spDraft.setAdapter(draftAdapter);
-        spDraft.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectDraft = (DraftInfo) spDraft.getItemAtPosition(position);// 选择连接协议
-
-                etDetails.append("当前连接协议：" + selectDraft.draftName + "\n");
-
-                Log.e("wlf", "选择连接协议：" + selectDraft.draftName);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                selectDraft = null;// 清空
-
-                Log.e("wlf", "未选择任何连接协议");
-            }
-        });
 
         ServerInfo[] serverInfos = {new ServerInfo("连接Java Web后台", "ws://172.100.101.106:9997"),
                 new ServerInfo("连接Java Application后台", "ws://172.100.101.106:9997")};// 所有连接后台
@@ -391,10 +368,6 @@ public class ChatClientActivity1 extends AppCompatActivity implements OnClickLis
 
             case R.id.btnBind:
 
-                BindRequest request = new BindRequest();
-                request.setDeviceid(DeviceUtil.getUniqueId(ChatClientActivity1.this));
-                request.setSign(request.getSign());
-                sendMessage(gson.toJson(request));
                 break;
         }
     }

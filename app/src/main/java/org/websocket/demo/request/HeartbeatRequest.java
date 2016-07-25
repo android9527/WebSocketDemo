@@ -23,7 +23,7 @@ public class HeartbeatRequest extends BaseRequest {
      */
 
     private String pkg_type = MessageId.PKG_HEART;
-    private String apptype = Constant.apptype;
+    private String apptype = Constant.app_type;
     private String sign = "";
 
     public String getPkg_type() {
