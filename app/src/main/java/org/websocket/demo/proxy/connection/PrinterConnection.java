@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 
 import com.gprinter.aidl.GpService;
@@ -134,21 +135,23 @@ public class PrinterConnection {
 
         LogUtil.e(TAG, String.valueOf(mPortParam.getPortOpenState()));
         if (!checkPortParameters(mPortParam)) {
-            ToastUtil.showLong(mContext, "打印机参数错误！");
+//            ToastUtil.showLong(mContext, "打印机参数错误！");
+
+            LogUtil.d(TAG, "打印机参数错误！");
             return;
         }
         int rel = 0;
         switch (mPortParam.getPortType()) {
-            case PortParameters.USB:
+            case PortParameters.ETHERNET:
                 try {
-                    rel = mGpService.openPort(mPrinterId, mPortParam.getPortType(), mPortParam.getUsbDeviceName(), 0);
+                    rel = mGpService.openPort(mPrinterId, mPortParam.getPortType(), mPortParam.getIpAddr(), mPortParam.getPortNumber());
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
                 break;
-            case PortParameters.ETHERNET:
+            case PortParameters.USB:
                 try {
-                    rel = mGpService.openPort(mPrinterId, mPortParam.getPortType(), mPortParam.getIpAddr(), mPortParam.getPortNumber());
+                    rel = mGpService.openPort(mPrinterId, mPortParam.getPortType(), mPortParam.getUsbDeviceName(), 0);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -178,6 +181,8 @@ public class PrinterConnection {
      * 断开打印机
      */
     private void disconnectToDevice() {
+
+        // TODO
         if (null != mPortParam && mPortParam.getPortOpenState()) {
             LogUtil.d(TAG, "DisconnectToDevice ");
             try {
@@ -231,7 +236,7 @@ public class PrinterConnection {
         mContext.registerReceiver(printerStatusBroadcastReceiver, filter);
     }
 
-    private BroadcastReceiver printerStatusBroadcastReceiver = new BroadcastReceiver() {
+    public BroadcastReceiver printerStatusBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!GpCom.ACTION_CONNECT_STATUS.equals(intent.getAction())) {
@@ -251,20 +256,28 @@ public class PrinterConnection {
                     break;
                 case GpDevice.STATE_NONE:
                     mPortParam.setPortOpenState(false);
-                    ServiceProxy.getInstance().stopPrintThread();
+//                    ServiceProxy.getInstance().stopPrintThread();
+
+                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.EVENT_PRINT_MSG);
                     break;
                 case GpDevice.STATE_VALID_PRINTER:
                     // 连接打印机成功
                     mPortParam.setPortOpenState(true);
                     LogUtil.e(TAG, "连接打印机成功！");
-                    ToastUtil.showLong(mContext, "连接打印机成功！");
-                    ServiceProxy.getInstance().startPrintThread();
+                    ServiceProxy serviceProxy = ServiceProxy.getInstance();
+//                    serviceProxy.startPrintThread();
 
+                    ServiceProxy.ServiceHandler handler = serviceProxy.getServiceHandler();
+                    if (!handler.hasMessages(ServiceProxy.EVENT_PRINT_MSG)) {
+                        Message msg = handler.obtainMessage(ServiceProxy.EVENT_PRINT_MSG);
+                        handler.sendMessageDelayed(msg, 3000L);
+                    }
                     break;
                 case GpDevice.STATE_INVALID_PRINTER:
                 default:
-                    ToastUtil.showLong(mContext, "Please use Gprinter!");
-                    ServiceProxy.getInstance().stopPrintThread();
+                    LogUtil.e(TAG, "Please use Gprinter!");
+//                    ServiceProxy.getInstance().stopPrintThread();
+                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.EVENT_PRINT_MSG);
                     break;
             }
         }
@@ -288,6 +301,8 @@ public class PrinterConnection {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            disConnect();
         }
         return result;
     }

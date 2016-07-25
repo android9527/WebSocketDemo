@@ -47,6 +47,10 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private static final int EVENT_NETWORK_STATE_CHANGED = 200;
 
+    public static final int EVENT_PRINT_MSG = EVENT_NETWORK_STATE_CHANGED + 1;
+
+    public static final int EVENT_PRINTER_CONNECT_FAILED = EVENT_PRINT_MSG + 1;
+
     private ServiceHandler mServiceHandler;
 
     private IConnection connection;
@@ -119,7 +123,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     /**
      * 类描述：监听网络连接回调Handler 修改时间：
      */
-    private static final class ServiceHandler extends BaseHandler<ServiceProxy> {
+    public static final class ServiceHandler extends BaseHandler<ServiceProxy> {
         public ServiceHandler(ServiceProxy proxy) {
             super(proxy);
         }
@@ -130,9 +134,17 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                 case EVENT_NETWORK_STATE_CHANGED:
                     proxy.networkStateChanged();
                     break;
+                case EVENT_PRINT_MSG:
+
+                    proxy.printMsg();
+                    break;
                 default:
             }
         }
+    }
+
+    public ServiceHandler getServiceHandler() {
+        return mServiceHandler;
     }
 
     /**
@@ -670,16 +682,15 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     /**
      * 打印队列里面的数据
      */
-    public void printMsg() throws InterruptedException {
+    public void printMsg() {
         if (!checkEnvironment())
             return;
-        // 如果队列为空则阻塞
-        String text = blockingQueue.take();
+        // 如果队列为空则返回null
+        String text = blockingQueue.poll();
 
-        // TODO
-//            if (TextUtils.isEmpty(text)) {
-//                return;
-//            }
+        if (TextUtils.isEmpty(text)) {
+            return;
+        }
         boolean success = PrinterConnection.getInstance().printText(text);
         if (!success) {
             // TODO

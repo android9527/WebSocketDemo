@@ -106,8 +106,6 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         client.addImpsConnection(this);
 //        onClosed();
 
-
-
         findViewById(R.id.btnSetting).setOnClickListener(this);
     }
 
@@ -118,7 +116,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
                 client.connect(etAddress.getText().toString());
                 break;
             case R.id.btnClose:
-                client.disConnect(false);
+                client.disConnect(true);
                 break;
 
             case R.id.btnBind:
