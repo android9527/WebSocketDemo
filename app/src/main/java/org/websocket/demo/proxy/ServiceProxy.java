@@ -11,7 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
-import org.websocket.demo.proxy.connection.PrintConnection;
+import org.websocket.demo.proxy.connection.PrinterConnection;
 import org.websocket.demo.request.BaseRequest;
 import org.websocket.demo.request.BindRequest;
 import org.websocket.demo.request.HeartbeatRequest;
@@ -84,7 +84,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         ScheduleTaskService.getInstance().init(mContext);
         connection = OkHttpWebSocketConnection.instance(mContext);
         initListener(mContext);
-        PrintConnection.getInstance().init(mContext);
+        PrinterConnection.getInstance().init(mContext);
     }
 
     private void initListener(Context context) {
@@ -201,7 +201,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     public void disConnect(boolean needReConnect) {
         connection.disConnect(needReConnect);
         stopPrintThread();
-        PrintConnection.getInstance().disConnect();
+        PrinterConnection.getInstance().disConnect();
     }
 
 
@@ -663,7 +663,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             LogUtil.d(TAG, "mContext == null");
             return;
         }
-        PrintConnection.getInstance().connect();
+        PrinterConnection.getInstance().connect();
     }
 
 
@@ -680,7 +680,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 //            if (TextUtils.isEmpty(text)) {
 //                return;
 //            }
-        boolean success = PrintConnection.getInstance().printText(text);
+        boolean success = PrinterConnection.getInstance().printText(text);
         if (!success) {
             // TODO
 //            blockingQueue.put(text);

@@ -27,10 +27,10 @@ import org.websocket.demo.util.ToastUtil;
  * Created by chenfeiyue on 16/7/25.
  * PrintConnection
  */
-public class PrintConnection {
+public class PrinterConnection {
 
     private static final String TAG = "PrintConnection";
-    private static PrintConnection connection;
+    private static PrinterConnection connection;
     private int mPrinterId = 0;
 
     private GpService mGpService = null;
@@ -42,11 +42,11 @@ public class PrintConnection {
 
     private Intent intent;
 
-    public static PrintConnection getInstance() {
+    public static PrinterConnection getInstance() {
         if (connection == null) {
-            synchronized (PrintConnection.class) {
+            synchronized (PrinterConnection.class) {
                 if (connection == null) {
-                    connection = new PrintConnection();
+                    connection = new PrinterConnection();
                 }
             }
         }
