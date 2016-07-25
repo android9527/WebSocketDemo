@@ -137,8 +137,6 @@ public class PrinterConnection {
 
         LogUtil.e(TAG, String.valueOf(mPortParam.getPortOpenState()));
         if (!checkPortParameters(mPortParam)) {
-//            ToastUtil.showLong(mContext, "打印机参数错误！");
-
             LogUtil.d(TAG, "打印机参数错误！");
             return;
         }
@@ -258,8 +256,6 @@ public class PrinterConnection {
                     break;
                 case GpDevice.STATE_NONE:
                     mPortParam.setPortOpenState(false);
-//                    ServiceProxy.getInstance().stopPrintThread();
-
                     ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.MSG_PRINT_TEXT);
                     break;
                 case GpDevice.STATE_VALID_PRINTER:
@@ -267,8 +263,6 @@ public class PrinterConnection {
                     mPortParam.setPortOpenState(true);
                     LogUtil.e(TAG, "连接打印机成功！");
                     ServiceProxy serviceProxy = ServiceProxy.getInstance();
-//                    serviceProxy.startPrintThread();
-
                     ServiceProxy.ServiceHandler handler = serviceProxy.getServiceHandler();
                     if (!handler.hasMessages(ServiceProxy.MSG_PRINT_TEXT)) {
                         Message msg = handler.obtainMessage(ServiceProxy.MSG_PRINT_TEXT);
@@ -278,7 +272,6 @@ public class PrinterConnection {
                 case GpDevice.STATE_INVALID_PRINTER:
                 default:
                     LogUtil.e(TAG, "Please use Gprinter!");
-//                    ServiceProxy.getInstance().stopPrintThread();
                     ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.MSG_PRINT_TEXT);
                     break;
             }

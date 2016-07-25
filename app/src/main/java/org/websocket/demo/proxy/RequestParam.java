@@ -10,7 +10,7 @@ public class RequestParam {
     /**
      * 设定超时时长
      */
-    private int timeout = 5;
+    private int timeout = 30 * 1000;
 
     public RequestParam() {
     }
