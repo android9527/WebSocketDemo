@@ -1,9 +1,7 @@
 package org.websocket.demo.request;
 
-import android.util.Log;
-
 import org.websocket.demo.proxy.MessageId;
-import org.websocket.demo.util.LogUtil;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.Utils;
 
 /**

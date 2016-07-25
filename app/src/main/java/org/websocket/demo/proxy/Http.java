@@ -2,7 +2,7 @@ package org.websocket.demo.proxy;
 
 import org.websocket.demo.AsyncTaskExecutors;
 import org.websocket.demo.WebSocketService;
-import org.websocket.demo.request.Constant;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;

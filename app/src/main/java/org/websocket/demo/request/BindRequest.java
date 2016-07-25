@@ -1,6 +1,7 @@
 package org.websocket.demo.request;
 
 import org.websocket.demo.proxy.MessageId;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.Utils;
 
 /**

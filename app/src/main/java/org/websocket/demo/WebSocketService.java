@@ -1,8 +1,10 @@
 package org.websocket.demo;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 
 import org.websocket.demo.proxy.Http;
@@ -17,6 +19,8 @@ import org.websocket.demo.util.LogUtil;
 public class WebSocketService extends Service {
 
     static final String TAG = "WebSocketService";
+
+    private static final int GRAY_SERVICE_ID = 0;
 
     /**
      * mBinder
@@ -42,6 +46,15 @@ public class WebSocketService extends Service {
     public void onCreate() {
         super.onCreate();
         instance = this;
+
+        if (Build.VERSION.SDK_INT < 18) {
+            //API < 18 ，此方法能有效隐藏Notification上的图标
+            startForeground(GRAY_SERVICE_ID, new Notification());
+        } else {
+            Intent innerIntent = new Intent(this, DaemonInnerService.class);
+            startService(innerIntent);
+            startForeground(GRAY_SERVICE_ID, new Notification());
+        }
         LogUtil.d(TAG, "WebSocketService onCreate()");
         serviceProxy = ServiceProxy.getInstance();
         serviceProxy.init(instance);
@@ -141,6 +154,39 @@ public class WebSocketService extends Service {
 //        close();
         serviceProxy.cancelAllRequest();
 //        connect(true);
+    }
+
+
+    /**
+     * 给 API >= 18 的平台上用的灰色保活手段
+     */
+    public static class DaemonInnerService extends Service {
+
+        @Override
+        public void onCreate() {
+            LogUtil.d(TAG, "InnerService -> onCreate");
+            super.onCreate();
+        }
+
+        @Override
+        public int onStartCommand(Intent intent, int flags, int startId) {
+            LogUtil.d(TAG, "InnerService -> onStartCommand");
+            startForeground(GRAY_SERVICE_ID, new Notification());
+            //stopForeground(true);
+            stopSelf();
+            return super.onStartCommand(intent, flags, startId);
+        }
+
+        @Override
+        public IBinder onBind(Intent intent) {
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        @Override
+        public void onDestroy() {
+            LogUtil.d(TAG, "InnerService -> onDestroy");
+            super.onDestroy();
+        }
     }
 
 }

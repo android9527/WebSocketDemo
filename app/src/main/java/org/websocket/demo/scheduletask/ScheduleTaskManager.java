@@ -137,8 +137,15 @@ public class ScheduleTaskManager extends BroadcastReceiver implements
         }
 
         // Unregister the BroadcastReceiver if there isn't a alarm anymore.
+        /**
+         * java.lang.IllegalArgumentException: Receiver not registered:
+         */
         if (mAlarms.size() == 0) {
-            mContext.unregisterReceiver(this);
+            try {
+                mContext.unregisterReceiver(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

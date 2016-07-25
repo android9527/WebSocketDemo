@@ -1,4 +1,4 @@
-package org.websocket.demo.request;
+package org.websocket.demo.util;
 
 /**
  * Created by chenfeiyue on 16/7/18.
@@ -98,6 +98,11 @@ public class Constant {
     public static final String MESSAGE_BODY = "message_body";
 
 
+    public static final String DEFAULT_PRINT_IP = "192.168.123.100";
+
+    public static final String DEFAULT_PRINT_PORT = "9100";
+
+
     public static final class SPKey{
         public static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
 
@@ -110,6 +115,15 @@ public class Constant {
 
         public static final String KEY_MSG_RESENT_INTERVAL = "msg_resend_interval";
 
+        /**
+         * 打印机ip
+         */
+        public static final String KEY_PRINT_IP = "print_ip";
+
+        /**
+         * 打印机端口
+         */
+        public static final String KEY_PRINT_PORT = "print_port";
     }
 
 

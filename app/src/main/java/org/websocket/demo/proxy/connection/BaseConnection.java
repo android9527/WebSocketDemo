@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.proxy.TcpMessageParser;
-import org.websocket.demo.request.Constant;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.LogUtil;
@@ -124,14 +124,10 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
     @Override
     public void stopReConnect() {
         reConnectCount = 0;
-        try {
-            ScheduleTaskService.getInstance()
-                    .getScheduleTaskManager()
-                    .stopSchedule(this);
-            LogUtil.d(TAG, "Stop stopReConnect...leave");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ScheduleTaskService.getInstance()
+                .getScheduleTaskManager()
+                .stopSchedule(this);
+        LogUtil.d(TAG, "Stop stopReConnect...leave");
     }
 
     /**

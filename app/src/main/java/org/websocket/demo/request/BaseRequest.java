@@ -1,5 +1,7 @@
 package org.websocket.demo.request;
 
+import org.websocket.demo.util.Constant;
+
 /**
  * Created by chenfeiyue on 16/7/18.
  */

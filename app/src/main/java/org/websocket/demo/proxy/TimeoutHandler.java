@@ -3,11 +3,10 @@ package org.websocket.demo.proxy;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.WebSocketService;
-import org.websocket.demo.request.Constant;
+import org.websocket.demo.util.Constant;
 
 public class TimeoutHandler implements ITimerHandler {
     @SuppressLint("UseSparseArrays")

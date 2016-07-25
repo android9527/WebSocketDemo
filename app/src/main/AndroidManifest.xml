@@ -40,6 +40,18 @@
                 <action android:name="org.websocket.demo.WebSocketService"></action>
             </intent-filter>
         </service>
+
+        <service
+            android:name="com.gprinter.service.GpPrintService"
+            android:label="GpPrintService"
+            android:process=":remote"
+            android:enabled="true"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="com.gprinter.aidl.GpPrintService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

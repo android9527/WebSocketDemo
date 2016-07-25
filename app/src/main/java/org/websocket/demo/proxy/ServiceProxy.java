@@ -18,7 +18,7 @@ import org.websocket.demo.request.PushResponse;
 import org.websocket.demo.util.DeviceUtil;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
-import org.websocket.demo.request.Constant;
+import org.websocket.demo.util.Constant;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
 
@@ -173,6 +173,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         if (status) {
             startBindClient();
         } else {
+//            ScheduleTaskService.getInstance().shutdown();
             stopHeartBeat();
             cancelAllRequest();
         }
@@ -445,7 +446,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         // 清除缓存数据
         cancelAllRequest();
         ScheduleTaskService.getInstance().shutdown();
-//        stopHeartBeat();
         stopNetworkListener();
     }
 

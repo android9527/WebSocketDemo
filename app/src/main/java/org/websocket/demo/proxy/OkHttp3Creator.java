@@ -3,7 +3,7 @@ package org.websocket.demo.proxy;
 
 import android.content.Context;
 
-import org.websocket.demo.request.Constant;
+import org.websocket.demo.util.Constant;
 
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
