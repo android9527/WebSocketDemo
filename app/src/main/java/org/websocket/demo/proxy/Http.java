@@ -106,6 +106,7 @@ public class Http implements Runnable {
 
     @Override
     public void run() {
+        LogUtil.e(TAG, Thread.currentThread().getName());
         if (sendMessageToServer()) {
             ScheduleTaskService
                     .getInstance().getScheduleTaskManager()

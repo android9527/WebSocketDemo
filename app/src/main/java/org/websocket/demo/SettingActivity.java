@@ -51,7 +51,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 SPUtil.getInstance(SettingActivity.this).save(Constant.SPKey.KEY_PRINT_DEVICE_ID, etDeviceId.getText().toString().trim());
 
                 ServiceProxy.getInstance().init(SettingActivity.this);
-                ServiceProxy.getInstance().disConnect(false);
+                ServiceProxy.getInstance().disConnect(true);
 
                 break;
         }

@@ -6,24 +6,20 @@ package org.websocket.demo.proxy;
  */
 public class PrintThread extends Thread {
 
-    private boolean isRun = false;
-
     @Override
     public void run() {
-        isRun = true;
 
-        while (isRun) {
-            try {
-                ServiceProxy.getInstance().printMsg();
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            ServiceProxy.getInstance().printMsg();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ServiceProxy.getInstance().disConnectPrint();
         }
     }
 
     public void disConnect() {
-        isRun = false;
+        ServiceProxy.getInstance().stopPrintMsg();
         interrupt();
     }
 

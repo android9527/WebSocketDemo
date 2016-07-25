@@ -58,6 +58,7 @@ public class PrinterConnection {
         if (mContext != null) {
             return;
         }
+        LogUtil.d(TAG, "init ");
         mContext = context.getApplicationContext();
         bindService();
         registerBroadcast();
@@ -75,6 +76,7 @@ public class PrinterConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mContext = null;
     }
 
     /**
@@ -181,7 +183,7 @@ public class PrinterConnection {
      * 断开打印机
      */
     private void disconnectToDevice() {
-
+        LogUtil.d(TAG, "DisconnectToDevice ");
         // TODO
         if (null != mPortParam && mPortParam.getPortOpenState()) {
             LogUtil.d(TAG, "DisconnectToDevice ");
@@ -258,7 +260,7 @@ public class PrinterConnection {
                     mPortParam.setPortOpenState(false);
 //                    ServiceProxy.getInstance().stopPrintThread();
 
-                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.EVENT_PRINT_MSG);
+                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.MSG_PRINT_TEXT);
                     break;
                 case GpDevice.STATE_VALID_PRINTER:
                     // 连接打印机成功
@@ -268,8 +270,8 @@ public class PrinterConnection {
 //                    serviceProxy.startPrintThread();
 
                     ServiceProxy.ServiceHandler handler = serviceProxy.getServiceHandler();
-                    if (!handler.hasMessages(ServiceProxy.EVENT_PRINT_MSG)) {
-                        Message msg = handler.obtainMessage(ServiceProxy.EVENT_PRINT_MSG);
+                    if (!handler.hasMessages(ServiceProxy.MSG_PRINT_TEXT)) {
+                        Message msg = handler.obtainMessage(ServiceProxy.MSG_PRINT_TEXT);
                         handler.sendMessageDelayed(msg, 3000L);
                     }
                     break;
@@ -277,33 +279,31 @@ public class PrinterConnection {
                 default:
                     LogUtil.e(TAG, "Please use Gprinter!");
 //                    ServiceProxy.getInstance().stopPrintThread();
-                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.EVENT_PRINT_MSG);
+                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.MSG_PRINT_TEXT);
                     break;
             }
         }
     };
 
-    public boolean printText(String text) {
-        if (mContext == null) {
-            LogUtil.d("mContext == null");
+    public synchronized boolean printText(String text) throws RemoteException {
+        if (mContext == null || mGpService == null) {
+            LogUtil.d("mContext == null ||  mGpService == null");
             return false;
         }
 
         boolean result = false;
-        try {
-            int rel = mGpService.sendEscCommand(mPrinterId, text);
-            GpCom.ERROR_CODE r = GpCom.ERROR_CODE.values()[rel];
-            if (r != GpCom.ERROR_CODE.SUCCESS) {
+//        try {
+        int rel = mGpService.sendEscCommand(mPrinterId, text);
+        GpCom.ERROR_CODE r = GpCom.ERROR_CODE.values()[rel];
+        if (r != GpCom.ERROR_CODE.SUCCESS) {
 //                ToastUtil.showLong(mContext, GpCom.getErrorText(r));
-                result = false;
-            } else {
-                result = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            disConnect();
+            result = false;
+        } else {
+            result = true;
         }
+//        } finally {
+//            disConnect();
+//        }
         return result;
     }
 

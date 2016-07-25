@@ -3,6 +3,7 @@ package org.websocket.demo.proxy;
 import android.content.Context;
 import android.net.NetworkInfo;
 import android.os.Message;
+import android.os.RemoteException;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ import org.websocket.demo.request.HeartbeatRequest;
 import org.websocket.demo.request.PushResponse;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;
+import org.websocket.demo.util.AsyncTaskExecutors;
 import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.DeviceUtil;
 import org.websocket.demo.util.LogUtil;
@@ -47,9 +49,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private static final int EVENT_NETWORK_STATE_CHANGED = 200;
 
-    public static final int EVENT_PRINT_MSG = EVENT_NETWORK_STATE_CHANGED + 1;
+    public static final int MSG_PRINT_TEXT = EVENT_NETWORK_STATE_CHANGED + 1;
 
-    public static final int EVENT_PRINTER_CONNECT_FAILED = EVENT_PRINT_MSG + 1;
+    public static final int MSG_PRINTER_CONNECT_FAILED = MSG_PRINT_TEXT + 1;
 
     private ServiceHandler mServiceHandler;
 
@@ -73,6 +75,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private PrintThread printThread;
 
+    private boolean printing = false;
+
     public ServiceProxy() {
     }
 
@@ -84,6 +88,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         if (mContext != null) {
             return;
         }
+
+        LogUtil.d(TAG, "init");
         mContext = context.getApplicationContext();
         ScheduleTaskService.getInstance().init(mContext);
         connection = OkHttpWebSocketConnection.instance(mContext);
@@ -134,9 +140,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                 case EVENT_NETWORK_STATE_CHANGED:
                     proxy.networkStateChanged();
                     break;
-                case EVENT_PRINT_MSG:
+                case MSG_PRINT_TEXT:
 
-                    proxy.printMsg();
+                    proxy.startPrintMsg();
                     break;
                 default:
             }
@@ -212,7 +218,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     public void disConnect(boolean needReConnect) {
         connection.disConnect(needReConnect);
-        stopPrintThread();
+        stopPrintMsg();
         PrinterConnection.getInstance().disConnect();
     }
 
@@ -475,13 +481,16 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
     /**
-     * 方法名称：stopService 方法描述：停止服务 输入参数： 返回类型：void： 备注：
+     * 方法名称：shutdown 方法描述：停止服务 输入参数： 返回类型：void： 备注：
      */
-    public void stopService() {
-        connection.removeAllImpsConnection();
+    public void shutdown() {
         clearAll();
+        stopPrintMsg();
+        clearPrintQueue();
+        connection.removeAllImpsConnection();
         connection.disConnect(false);
-//        PrintConnection.getInstance().shutdown();
+        PrinterConnection.getInstance().shutdown();
+        mContext = null;
     }
 
     /**
@@ -496,7 +505,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     private void stopNetworkListener() {
         if (null != mNetworkConnectivityListener) {
-            LogUtil.d(TAG, "unregisterHandler");
+            LogUtil.d(TAG, "unregisterHandler mNetworkConnectivityListener");
             mNetworkConnectivityListener.unregisterHandler(mServiceHandler);
             mNetworkConnectivityListener.stopListening();
             mNetworkConnectivityListener = null;
@@ -624,20 +633,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                     break;
                 // 收到推送
                 case MessageId.PKG_DEVICE_PUSH:
-                    if (object.has("msg_id")) {
-                        sendPushResponse(object);
-                        if (object.has("msg")) {
-                            String msg = object.getString("msg");
-                            if (!TextUtils.isEmpty(msg)) {
-                                try {
-                                    blockingQueue.put(msg);
-                                    connectPrint();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }
+                    parseBody(object);
                     break;
                 default:
                     break;
@@ -648,6 +644,27 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
     }
 
+
+    private void parseBody(JSONObject object) throws JSONException {
+        if (!object.has("msg_id")) {
+            LogUtil.d(TAG, "-------> 数据无效！");
+            return;
+        }
+        sendPushResponse(object);
+        if (!object.has("msg")) {
+            return;
+        }
+        String msg = object.getString("msg");
+        if (TextUtils.isEmpty(msg)) {
+            return;
+        }
+        try {
+            blockingQueue.put(msg);
+            connectPrint();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 发送推送响应
@@ -678,24 +695,78 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         PrinterConnection.getInstance().connect();
     }
 
+    /**
+     * 断开打印机
+     */
+    public void disConnectPrint() {
+        if (mContext == null) {
+            LogUtil.d(TAG, "mContext == null");
+            return;
+        }
+        PrinterConnection.getInstance().disConnect();
+    }
+
+    public void startPrintMsg() {
+        if (printing)
+            return;
+        AsyncTaskExecutors.executeTask(new PrintRunnable());
+    }
 
     /**
      * 打印队列里面的数据
      */
-    public void printMsg() {
+    public void printMsg() throws RemoteException, InterruptedException {
         if (!checkEnvironment())
             return;
         // 如果队列为空则返回null
-        String text = blockingQueue.poll();
-
+//        String text = blockingQueue.poll();
+        // TODO
+        // 取出队列头部数据，不移除
+        String text = blockingQueue.peek();
         if (TextUtils.isEmpty(text)) {
             return;
         }
         boolean success = PrinterConnection.getInstance().printText(text);
+
         if (!success) {
             // TODO
 //            blockingQueue.put(text);
+            LogUtil.d(TAG, "打印失败-------> " + text);
+            return;
         }
+        LogUtil.e(TAG, "打印成功-------> " + text + "\n" + Thread.currentThread().getName());
+        blockingQueue.poll();
+        if (blockingQueue.size() > 0 && printing) {
+            Thread.sleep(200);
+            printMsg();
+        }
+    }
+
+
+    public void clearPrintQueue() {
+        LogUtil.d(TAG, "clearPrintQueue");
+        blockingQueue.clear();
+    }
+
+    private final class PrintRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                printing = true;
+                printMsg();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                printing = false;
+                disConnectPrint();
+            }
+        }
+    }
+
+    public void stopPrintMsg() {
+        LogUtil.d(TAG, "stopPrintMsg");
+        printing = false;
     }
 
     public void startPrintThread() {

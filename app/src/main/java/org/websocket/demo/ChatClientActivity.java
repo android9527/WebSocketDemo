@@ -66,6 +66,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         }
     }
 
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,8 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         handler = new MyHandler(this);
         ServiceProxy.getInstance().init(this);
 //        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
-        startService(new Intent(ChatClientActivity.this, WebSocketService.class));
+        intent = new Intent(ChatClientActivity.this, WebSocketService.class);
+        startService(intent);
 
         btnConnect = (Button) findViewById(R.id.btnConnect);
         btnClose = (Button) findViewById(R.id.btnClose);
@@ -166,15 +168,15 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
     @Override
     public void receiveMsg(TcpMessage msg) {
-
+        Message message = handler.obtainMessage(MESSAGE_RECEIVE);
+        message.obj = msg.getBody();
+        handler.sendMessage(message);
     }
 
     @Override
     public void receiveMsg(String msg) {
 
-        Message message = handler.obtainMessage(MESSAGE_RECEIVE);
-        message.obj = msg;
-        handler.sendMessage(message);
+
     }
 
     @Override

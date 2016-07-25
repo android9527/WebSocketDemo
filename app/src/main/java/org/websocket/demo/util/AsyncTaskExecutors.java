@@ -1,5 +1,7 @@
 package org.websocket.demo.util;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -18,8 +20,10 @@ public class AsyncTaskExecutors {
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {
         private final AtomicInteger mCount = new AtomicInteger(1);
 
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
+        public Thread newThread(@NonNull Runnable r) {
+            Thread thread = new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
         }
     };
 
@@ -39,7 +43,7 @@ public class AsyncTaskExecutors {
     /**
      * 并发执行多任务
      *
-     * @param runnable
+     * @param runnable runnable
      * @return
      */
     public static Future<?> executeTask(final Runnable runnable) {

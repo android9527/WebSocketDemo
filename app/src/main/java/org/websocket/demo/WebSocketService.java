@@ -109,7 +109,7 @@ public class WebSocketService extends Service {
         LogUtil.d(TAG, "onDestroy ...... ");
         // TODO
         if (null != serviceProxy) {
-            serviceProxy.stopService();
+            serviceProxy.shutdown();
         }
 
         startService(new Intent(WebSocketService.this, WebSocketService.class));
