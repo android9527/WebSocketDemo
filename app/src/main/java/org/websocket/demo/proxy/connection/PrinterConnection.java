@@ -25,7 +25,7 @@ import org.websocket.demo.util.ToastUtil;
 
 /**
  * Created by chenfeiyue on 16/7/25.
- * PrintConnection
+ * PrintConnection 佳博打印机
  */
 public class PrinterConnection {
 
@@ -173,7 +173,6 @@ public class PrinterConnection {
             if (r == GpCom.ERROR_CODE.DEVICE_ALREADY_OPEN) {
                 mPortParam.setPortOpenState(true);
             } else {
-//                ToastUtil.showLong(mContext, GpCom.getErrorText(r));
                 // TODO
                 LogUtil.d(TAG, GpCom.getErrorText(r));
             }
@@ -200,6 +199,9 @@ public class PrinterConnection {
         }
     }
 
+    /**
+     * 绑定服务
+     */
     private void bindService() {
         conn = new PrinterServiceConnection();
         LogUtil.d(TAG, "connection");
@@ -237,6 +239,9 @@ public class PrinterConnection {
     }
 
 
+    /**
+     * 广播注册
+     */
     private void registerBroadcast() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(GpCom.ACTION_CONNECT_STATUS);
@@ -250,7 +255,6 @@ public class PrinterConnection {
                 return;
             }
 
-//            context.startService(new Intent(context, WebSocketService.class));
             int id = intent.getIntExtra(GpPrintService.PRINTER_ID, 0);
             if (mPrinterId != id) {
                 return;
@@ -285,28 +289,33 @@ public class PrinterConnection {
         }
     };
 
+    /**
+     * 打印数据
+     * @param text base64
+     * @return true or false
+     * @throws RemoteException
+     */
     public synchronized boolean printText(String text) throws RemoteException {
         if (mContext == null || mGpService == null) {
             LogUtil.d("mContext == null ||  mGpService == null");
             return false;
         }
-
-        boolean result = false;
-//        try {
+        boolean result;
         int rel = mGpService.sendEscCommand(mPrinterId, text);
         GpCom.ERROR_CODE r = GpCom.ERROR_CODE.values()[rel];
         if (r != GpCom.ERROR_CODE.SUCCESS) {
-//                ToastUtil.showLong(mContext, GpCom.getErrorText(r));
+            LogUtil.w(TAG, "打印失败---->" + GpCom.getErrorText(r));
             result = false;
         } else {
             result = true;
         }
-//        } finally {
-//            disConnect();
-//        }
         return result;
     }
 
+
+    /**
+     * 获取打印机状态
+     */
     public void getPrinterStatus() {
         if (mGpService == null) {
             LogUtil.d(TAG, "未连接打印机");
@@ -338,7 +347,6 @@ public class PrinterConnection {
             }
             LogUtil.d(TAG, "打印机：" + mPrinterId + " 状态：" + str);
         } catch (RemoteException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     }

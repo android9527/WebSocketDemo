@@ -228,6 +228,10 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
 
+    /**
+     * 断开服务器连接
+     * @param needReConnect 是否需要重连
+     */
     public void disConnect(boolean needReConnect) {
         connection.disConnect(needReConnect);
         stopPrintMsg();
@@ -515,6 +519,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         stopNetworkListener();
     }
 
+    /**
+     * 停止网络监听
+     */
     private void stopNetworkListener() {
         if (null != mNetworkConnectivityListener) {
             LogUtil.d(TAG, "unregisterHandler mNetworkConnectivityListener");
@@ -657,6 +664,11 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
 
+    /**
+     * body 数据解析
+     * @param object object
+     * @throws JSONException
+     */
     private void parseBody(JSONObject object) throws JSONException {
         if (!object.has("msg_id")) {
             LogUtil.d(TAG, "-------> 数据无效！");
@@ -718,6 +730,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         PrinterConnection.getInstance().disConnect();
     }
 
+    /**
+     * 开始打印
+     */
     public void startPrintMsg() {
         LogUtil.d(TAG, "isPrinting = " + isPrinting + "  isStartByMe = " + isStartByMe);
         if (isPrinting || !isStartByMe) {
@@ -772,6 +787,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         blockingQueue.clear();
     }
 
+    /**
+     * 打印线程
+     */
     private final class PrintRunnable implements Runnable {
 
         @Override
@@ -789,6 +807,9 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
     }
 
+    /**
+     * 停止打印
+     */
     public void stopPrintMsg() {
         LogUtil.d(TAG, "stopPrintMsg");
         isPrinting = false;
