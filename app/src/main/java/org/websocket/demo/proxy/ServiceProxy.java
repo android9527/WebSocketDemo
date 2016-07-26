@@ -153,8 +153,10 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                     proxy.networkStateChanged();
                     break;
                 case MSG_PRINT_TEXT:
-
                     proxy.startPrintMsg();
+                    break;
+                case MSG_PRINTER_CONNECT_FAILED:
+                    proxy.connPrintFail();
                     break;
                 default:
             }
@@ -230,6 +232,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     /**
      * 断开服务器连接
+     *
      * @param needReConnect 是否需要重连
      */
     public void disConnect(boolean needReConnect) {
@@ -666,6 +669,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     /**
      * body 数据解析
+     *
      * @param object object
      * @throws JSONException
      */
@@ -805,6 +809,17 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
                 disConnectPrint();
             }
         }
+    }
+
+    /**
+     * 连接打印机失败
+     */
+    private void connPrintFail() {
+//        if (isStartByMe) {
+//            // TODO
+//        }
+        LogUtil.w(TAG, "打印机断开！");
+        isStartByMe = false;
     }
 
     /**

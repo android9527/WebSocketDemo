@@ -267,17 +267,28 @@ public class PrinterConnection {
                     break;
                 case GpDevice.STATE_NONE:
                     mPortParam.setPortOpenState(false);
-                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.MSG_PRINT_TEXT);
+                    /**
+                     * 连接失败
+                     */
+                    ServiceProxy.ServiceHandler handler = ServiceProxy.getInstance().getServiceHandler();
+                    handler.removeMessages(ServiceProxy.MSG_PRINT_TEXT);
+                    if (!handler.hasMessages(ServiceProxy.MSG_PRINTER_CONNECT_FAILED)) {
+                        Message msg = handler.obtainMessage(ServiceProxy.MSG_PRINTER_CONNECT_FAILED);
+                        handler.sendMessageDelayed(msg, 2000L);
+                    }
+
                     break;
                 case GpDevice.STATE_VALID_PRINTER:
                     // 连接打印机成功
                     mPortParam.setPortOpenState(true);
                     LogUtil.e(TAG, "连接打印机成功！");
                     ServiceProxy serviceProxy = ServiceProxy.getInstance();
-                    ServiceProxy.ServiceHandler handler = serviceProxy.getServiceHandler();
-                    if (!handler.hasMessages(ServiceProxy.MSG_PRINT_TEXT)) {
-                        Message msg = handler.obtainMessage(ServiceProxy.MSG_PRINT_TEXT);
-                        handler.sendMessageDelayed(msg, 3000L);
+                    ServiceProxy.ServiceHandler serviceHandler = serviceProxy.getServiceHandler();
+
+                    serviceHandler.removeMessages(ServiceProxy.MSG_PRINTER_CONNECT_FAILED);
+                    if (!serviceHandler.hasMessages(ServiceProxy.MSG_PRINT_TEXT)) {
+                        Message msg = serviceHandler.obtainMessage(ServiceProxy.MSG_PRINT_TEXT);
+                        serviceHandler.sendMessageDelayed(msg, 3000L);
                     }
                     break;
                 case GpDevice.STATE_INVALID_PRINTER:
