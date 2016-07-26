@@ -42,8 +42,11 @@ public class JavaWebSocketConnection extends BaseConnection {
 
     @Override
     public boolean sendMessage(String message) {
-        // TODO
-        return super.sendMessage(message);
+        if (isConnected()) {
+            socket.send(message);
+            return true;
+        }
+        return false;
     }
 
     @Override
