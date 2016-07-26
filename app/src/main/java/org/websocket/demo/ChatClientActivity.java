@@ -11,7 +11,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
-import org.java_websocket.WebSocketImpl;
 import org.websocket.demo.proxy.BaseHandler;
 import org.websocket.demo.proxy.ImpsConnection;
 import org.websocket.demo.proxy.ServiceProxy;
@@ -97,8 +96,6 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         btnSetting.setOnClickListener(this);
         btnConnectPrint.setOnClickListener(this);
 
-
-        WebSocketImpl.DEBUG = true;
         System.setProperty("java.net.preferIPv6Addresses", "false");
         System.setProperty("java.net.preferIPv4Stack", "true");
 
