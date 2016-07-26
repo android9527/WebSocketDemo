@@ -111,6 +111,12 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        etAddress.setText(SPUtil.getInstance(ChatClientActivity.this).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL));
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnConnect:

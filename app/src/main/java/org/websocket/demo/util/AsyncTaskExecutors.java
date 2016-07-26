@@ -35,8 +35,11 @@ public class AsyncTaskExecutors {
 //            TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory);
 
 
+    /**
+     * newCachedThreadPool
+     */
     private static MoreExecutor THREAD_POOL_EXECUTOR = new MoreExecutor(0, Integer.MAX_VALUE,
-            1L, TimeUnit.SECONDS,
+            60L, TimeUnit.SECONDS,
             new SynchronousQueue<Runnable>());
 
 
@@ -50,7 +53,7 @@ public class AsyncTaskExecutors {
 
         if (THREAD_POOL_EXECUTOR.isShutdown()) {
             THREAD_POOL_EXECUTOR = new MoreExecutor(0, Integer.MAX_VALUE,
-                    1L, TimeUnit.SECONDS,
+                    60L, TimeUnit.SECONDS,
                     new SynchronousQueue<Runnable>());
         }
         return THREAD_POOL_EXECUTOR.executeTask(runnable);
