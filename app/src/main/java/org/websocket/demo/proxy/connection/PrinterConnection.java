@@ -129,7 +129,7 @@ public class PrinterConnection {
     /**
      * 连接打印机
      */
-    public void connect() {
+    public synchronized void connect() {
         if (null == mGpService) {
             LogUtil.d(TAG, "the mGpService is null !");
             return;
@@ -183,7 +183,7 @@ public class PrinterConnection {
     /**
      * 断开打印机
      */
-    private void disconnectToDevice() {
+    private synchronized void disconnectToDevice() {
         LogUtil.d(TAG, "DisconnectToDevice ");
         // TODO
         if (null == mGpService) {

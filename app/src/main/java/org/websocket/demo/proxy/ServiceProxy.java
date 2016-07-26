@@ -79,7 +79,15 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private PrintThread printThread;
 
-    private boolean printing = false;
+    /**
+     * 单线程打印，防止每次连接上打印机后都会开启线程打印
+     */
+    private boolean isPrinting = false;
+
+    /**
+     * 自己发起的连接打印机请求，连接广播之间互相影响
+     */
+    private boolean isStartByMe = false;
 
     public ServiceProxy() {
     }
@@ -687,15 +695,15 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         sendMessage(gson.toJson(response));
     }
 
-
     /**
      * 连接打印机
      */
     public void connectPrint() {
-        if (mContext == null) {
+        if (mContext == null || isPrinting) {
             LogUtil.d(TAG, "mContext == null");
             return;
         }
+        isStartByMe = true;
         PrinterConnection.getInstance().connect();
     }
 
@@ -711,8 +719,10 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
     public void startPrintMsg() {
-        if (printing)
+        LogUtil.d(TAG, "isPrinting = " + isPrinting + "  isStartByMe = " + isStartByMe);
+        if (isPrinting || !isStartByMe) {
             return;
+        }
         AsyncTaskExecutors.executeTask(new PrintRunnable());
     }
 
@@ -722,8 +732,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     public void printMsg() throws RemoteException, InterruptedException {
         if (!checkEnvironment())
             return;
-        // 如果队列为空则返回null
-//        String text = blockingQueue.poll();
         // TODO
         // 取出队列头部数据，不移除
         String text = blockingQueue.peek();
@@ -732,8 +740,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         }
         boolean success = PrinterConnection.getInstance().printText(text);
         if (!success) {
-            // TODO
-//            blockingQueue.put(text);
             LogUtil.d(TAG, "打印失败-------> " + text);
             return;
         }
@@ -747,8 +753,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         byte[] bytes = Utils.toPrimitive(Bytes);
         String str = Base64.encodeToString(bytes, Base64.DEFAULT);
         PrinterConnection.getInstance().printText(str);
-        if (blockingQueue.size() > 0 && printing) {
-            Thread.sleep(100);
+        if (blockingQueue.size() > 0 && isPrinting) {
+            Thread.sleep(50);
             printMsg();
         }
     }
@@ -771,12 +777,13 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         @Override
         public void run() {
             try {
-                printing = true;
+                isPrinting = true;
                 printMsg();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                printing = false;
+                isPrinting = false;
+                isStartByMe = false;
                 disConnectPrint();
             }
         }
@@ -784,7 +791,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
 
     public void stopPrintMsg() {
         LogUtil.d(TAG, "stopPrintMsg");
-        printing = false;
+        isPrinting = false;
     }
 
     public void startPrintThread() {
