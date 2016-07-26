@@ -57,6 +57,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
                     activity.onClosed();
                     break;
                 case MESSAGE_RECEIVE:
+                    activity.onConnected();
                     activity.etDetails.append("获取到服务器信息 " + msg.obj + "\n");
                     break;
                 case MESSAGE_SEND:
@@ -123,7 +124,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
                 client.connect(etAddress.getText().toString());
                 break;
             case R.id.btnClose:
-                client.disConnect(true);
+                client.disConnect(false);
                 break;
 
             case R.id.btnBind:

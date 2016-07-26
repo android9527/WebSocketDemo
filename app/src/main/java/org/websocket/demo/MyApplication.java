@@ -1,7 +1,7 @@
 package org.websocket.demo;
 
 import android.app.Application;
-import com.squareup.leakcanary.LeakCanary;
+//import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by chenfeiyue on 16/7/22.
@@ -11,6 +11,6 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        LeakCanary.install(MyApplication.this);
+//        LeakCanary.install(MyApplication.this);
     }
 }
