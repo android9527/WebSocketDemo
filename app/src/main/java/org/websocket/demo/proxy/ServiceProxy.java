@@ -5,8 +5,10 @@ import android.net.NetworkInfo;
 import android.os.Message;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import com.google.gson.Gson;
+import com.gprinter.command.EscCommand;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,10 +26,12 @@ import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.DeviceUtil;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
+import org.websocket.demo.util.Utils;
 
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
@@ -727,19 +731,33 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             return;
         }
         boolean success = PrinterConnection.getInstance().printText(text);
-
         if (!success) {
             // TODO
 //            blockingQueue.put(text);
             LogUtil.d(TAG, "打印失败-------> " + text);
             return;
         }
-        LogUtil.e(TAG, "打印成功-------> " + text + "\n" + Thread.currentThread().getName());
         blockingQueue.poll();
+        LogUtil.e(TAG, "打印成功-------> " + text + "\n" + Thread.currentThread().getName());
+        EscCommand esc = new EscCommand();
+        esc.addText("\n\n\n\n");   //  换行
+        esc.addCutPaper();
+        Vector<Byte> data = esc.getCommand(); //发送数据
+        Byte[] Bytes = data.toArray(new Byte[data.size()]);
+        byte[] bytes = Utils.toPrimitive(Bytes);
+        String str = Base64.encodeToString(bytes, Base64.DEFAULT);
+        PrinterConnection.getInstance().printText(str);
         if (blockingQueue.size() > 0 && printing) {
-            Thread.sleep(200);
+            Thread.sleep(100);
             printMsg();
         }
+    }
+
+    /**
+     * 打印机状态
+     */
+    public void getPrinterStatus() {
+        PrinterConnection.getInstance().getPrinterStatus();
     }
 
 

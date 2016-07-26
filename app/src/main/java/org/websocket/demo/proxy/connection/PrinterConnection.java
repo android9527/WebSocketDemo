@@ -17,7 +17,6 @@ import com.gprinter.io.PortParameters;
 import com.gprinter.save.PortParamDataBase;
 import com.gprinter.service.GpPrintService;
 
-import org.websocket.demo.WebSocketService;
 import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.LogUtil;
@@ -306,6 +305,42 @@ public class PrinterConnection {
 //            disConnect();
 //        }
         return result;
+    }
+
+    public void getPrinterStatus() {
+        if (mGpService == null) {
+            LogUtil.d(TAG, "未连接打印机");
+            return;
+        }
+
+        try {
+            int status = mGpService.queryPrinterStatus(mPrinterId, 500);
+            String str = "";
+            if (status == GpCom.STATE_NO_ERR) {
+                str = "打印机正常";
+            } else {
+                str = "打印机 ";
+                if ((byte) (status & GpCom.STATE_OFFLINE) > 0) {
+                    str += "脱机";
+                }
+                if ((byte) (status & GpCom.STATE_PAPER_ERR) > 0) {
+                    str += "缺纸";
+                }
+                if ((byte) (status & GpCom.STATE_COVER_OPEN) > 0) {
+                    str += "打印机开盖";
+                }
+                if ((byte) (status & GpCom.STATE_ERR_OCCURS) > 0) {
+                    str += "打印机出错";
+                }
+                if ((byte) (status & GpCom.STATE_TIMES_OUT) > 0) {
+                    str += "查询超时";
+                }
+            }
+            LogUtil.d(TAG, "打印机：" + mPrinterId + " 状态：" + str);
+        } catch (RemoteException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
 }

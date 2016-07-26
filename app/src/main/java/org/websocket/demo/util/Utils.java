@@ -8,6 +8,8 @@ import java.util.Map;
  * Created by chenfeiyue on 16/7/18.
  */
 public class Utils {
+
+    public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
     /**
      * 编码后进行验证的字符串
      */
@@ -61,5 +63,21 @@ public class Utils {
             hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
         }
         return hex.toString().toLowerCase();
+    }
+
+    public static byte[] toPrimitive(Byte[] array) {
+        if(array == null) {
+            return null;
+        } else if(array.length == 0) {
+            return EMPTY_BYTE_ARRAY;
+        } else {
+            byte[] result = new byte[array.length];
+
+            for(int i = 0; i < array.length; ++i) {
+                result[i] = array[i];
+            }
+
+            return result;
+        }
     }
 }
