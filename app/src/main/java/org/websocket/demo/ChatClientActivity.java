@@ -103,7 +103,6 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
         findViewById(R.id.btnBind).setOnClickListener(this);
 
-//        client = new WebSocketConnection(this.getApplicationContext());
         client = OkHttpWebSocketConnection.instance(this);
         client.addImpsConnection(this);
 //        onClosed();
@@ -133,9 +132,6 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 //                ServiceProxy.getInstance().stopPrintThread();
                 break;
 
-            case R.id.btn_connect:
-                ServiceProxy.getInstance().connectPrint();
-                break;
             case R.id.btn_setting:
                 showSettingDialog();
                 break;

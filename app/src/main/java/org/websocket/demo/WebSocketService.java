@@ -8,8 +8,8 @@ import android.os.Build;
 import android.os.IBinder;
 
 import org.websocket.demo.proxy.Http;
-import org.websocket.demo.proxy.SocketRequest;
 import org.websocket.demo.proxy.ServiceProxy;
+import org.websocket.demo.proxy.SocketRequest;
 import org.websocket.demo.util.LogUtil;
 
 
@@ -47,14 +47,12 @@ public class WebSocketService extends Service {
         super.onCreate();
         instance = this;
 
-        if (Build.VERSION.SDK_INT < 18) {
-            //API < 18 ，此方法能有效隐藏Notification上的图标
-            startForeground(GRAY_SERVICE_ID, new Notification());
-        } else {
+        if (Build.VERSION.SDK_INT >= 18) {
             Intent innerIntent = new Intent(this, DaemonInnerService.class);
             startService(innerIntent);
-            startForeground(GRAY_SERVICE_ID, new Notification());
         }
+        // foreground
+        startForeground(GRAY_SERVICE_ID, new Notification());
         LogUtil.d(TAG, "WebSocketService onCreate()");
         serviceProxy = ServiceProxy.getInstance();
         serviceProxy.init(instance);
@@ -107,7 +105,6 @@ public class WebSocketService extends Service {
     public void onDestroy() {
         super.onDestroy();
         LogUtil.d(TAG, "onDestroy ...... ");
-        // TODO
         if (null != serviceProxy) {
             serviceProxy.shutdown();
         }
@@ -131,8 +128,6 @@ public class WebSocketService extends Service {
         } else {
             LogUtil.d(TAG, "onStartCommand service restart by System");
         }
-        // TODO
-
         serviceProxy.connect();
         return START_REDELIVER_INTENT;
     }
@@ -162,13 +157,11 @@ public class WebSocketService extends Service {
 
         @Override
         public void onCreate() {
-            LogUtil.d(TAG, "InnerService -> onCreate");
             super.onCreate();
         }
 
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            LogUtil.d(TAG, "InnerService -> onStartCommand");
             startForeground(GRAY_SERVICE_ID, new Notification());
             //stopForeground(true);
             stopSelf();
@@ -182,7 +175,6 @@ public class WebSocketService extends Service {
 
         @Override
         public void onDestroy() {
-            LogUtil.d(TAG, "InnerService -> onDestroy");
             super.onDestroy();
         }
     }

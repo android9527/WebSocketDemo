@@ -131,15 +131,19 @@ public class PrinterConnection {
      * 连接打印机
      */
     public void connect() {
+        if (null == mGpService) {
+            LogUtil.d(TAG, "the mGpService is null !");
+            return;
+        }
         String ip = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PRINT_IP, Constant.DEFAULT_PRINT_IP);
         String port = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PRINT_PORT, Constant.DEFAULT_PRINT_PORT);
         setPrintParameters(ip, port);
 
-        LogUtil.e(TAG, String.valueOf(mPortParam.getPortOpenState()));
         if (!checkPortParameters(mPortParam)) {
             LogUtil.d(TAG, "打印机参数错误！");
             return;
         }
+        LogUtil.e(TAG, String.valueOf(mPortParam.getPortOpenState()));
         int rel = 0;
         switch (mPortParam.getPortType()) {
             case PortParameters.ETHERNET:
@@ -183,6 +187,10 @@ public class PrinterConnection {
     private void disconnectToDevice() {
         LogUtil.d(TAG, "DisconnectToDevice ");
         // TODO
+        if (null == mGpService) {
+            LogUtil.d(TAG, "the mGpService is null !");
+            return;
+        }
         if (null != mPortParam && mPortParam.getPortOpenState()) {
             LogUtil.d(TAG, "DisconnectToDevice ");
             try {
@@ -243,7 +251,7 @@ public class PrinterConnection {
                 return;
             }
 
-            context.startService(new Intent(context, WebSocketService.class));
+//            context.startService(new Intent(context, WebSocketService.class));
             int id = intent.getIntExtra(GpPrintService.PRINTER_ID, 0);
             if (mPrinterId != id) {
                 return;

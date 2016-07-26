@@ -37,9 +37,11 @@
         <service
             android:name="org.websocket.demo.WebSocketService"
             android:exported="true"
-            android:permission="com.qfpay.permission.PUSHCORE">
+            android:permission="com.qfpay.permission.PUSHCORE"
+            >
             <intent-filter>
-                <action android:name="org.websocket.demo.WebSocketService"></action>
+                <action android:name="org.websocket.demo.WebSocketService">
+                </action>
             </intent-filter>
         </service>
 
@@ -53,6 +55,12 @@
             <intent-filter>
                 <action android:name="com.gprinter.aidl.GpPrintService"/>
             </intent-filter>
+        </service>
+
+        <service
+            android:name="org.websocket.demo.WebSocketService$DaemonInnerService"
+            android:exported="true"
+            >
         </service>
     </application>
 

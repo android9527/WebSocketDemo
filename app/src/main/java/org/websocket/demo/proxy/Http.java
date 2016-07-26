@@ -90,7 +90,6 @@ public class Http implements Runnable {
     }
 
     public void cancel() {
-        stopReSend();
         cancelRequest();
     }
 
@@ -98,6 +97,7 @@ public class Http implements Runnable {
      * 取消请求操作
      */
     private void cancelRequest() {
+        stopReSend();
         if (null == mService) {
             return;
         }
