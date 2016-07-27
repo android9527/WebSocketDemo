@@ -38,6 +38,7 @@
             android:name="org.websocket.demo.WebSocketService"
             android:exported="true"
             android:permission="com.qfpay.permission.PUSHCORE"
+            android:process=":remote"
             >
             <intent-filter>
                 <action android:name="org.websocket.demo.WebSocketService">
@@ -60,6 +61,7 @@
         <service
             android:name="org.websocket.demo.WebSocketService$DaemonInnerService"
             android:exported="true"
+            android:process=":remote"
             >
         </service>
     </application>

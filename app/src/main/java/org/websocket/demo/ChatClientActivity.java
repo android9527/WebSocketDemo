@@ -17,6 +17,7 @@ import org.websocket.demo.proxy.ServiceProxy;
 import org.websocket.demo.proxy.TcpMessage;
 import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
+import org.websocket.demo.proxy.connection.PrinterConnection;
 import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.SPUtil;
 
@@ -73,7 +74,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_client);
         handler = new MyHandler(this);
-        ServiceProxy.getInstance().init(this);
+//        ServiceProxy.getInstance().init(this);
 //        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
         intent = new Intent(ChatClientActivity.this, WebSocketService.class);
         startService(intent);
@@ -101,11 +102,12 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 
         findViewById(R.id.btnBind).setOnClickListener(this);
 
-        client = OkHttpWebSocketConnection.instance(this);
-        client.addImpsConnection(this);
+//        client = OkHttpWebSocketConnection.instance(this);
+//        client.addImpsConnection(this);
 //        onClosed();
 
         findViewById(R.id.btnSetting).setOnClickListener(this);
+        PrinterConnection.getInstance().init(this);
     }
 
     @Override
@@ -118,22 +120,20 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnConnect:
-                client.connect(etAddress.getText().toString());
+//                client.connect(etAddress.getText().toString());
                 break;
             case R.id.btnClose:
-                client.disConnect(false);
+//                client.disConnect(false);
                 break;
 
             case R.id.btnBind:
-                ServiceProxy.getInstance().startBindClient();
-//                ServiceProxy.getInstance().startPrintThread();
+//                ServiceProxy.getInstance().startBindClient();
                 break;
             case R.id.btnClear:
                 etDetails.getText().clear();
                 break;
             case R.id.btnHeartbeat:
-                ServiceProxy.getInstance().sendHeartBeatRequest();
-//                ServiceProxy.getInstance().stopPrintThread();
+//                ServiceProxy.getInstance().sendHeartBeatRequest();
                 break;
 
             case R.id.btn_setting:
@@ -149,7 +149,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     protected void onDestroy() {
         super.onDestroy();
 //        client.disConnect();
-        client.removeImpsConnection(this);
+//        client.removeImpsConnection(this);
     }
 
     private void onConnected() {

@@ -136,7 +136,7 @@ public class Http implements Runnable {
             currentRequest.addSendNum();
             // 重发超过限定次数，不再保存请求对象
             if (currentRequest.getSendNum() >
-                    SPUtil.getInstance(mService).getInt(Constant.SPKey.KEY_RESEND_COUNT, Constant.DEFAULT_RESEND_COUNT)) {
+                    SPUtil.getInstance(mService).getInt(Constant.SPKey.KEY_RESEND_COUNT, Constant.DEFAULT_RESEND_COUNT, false)) {
                 cancelRequest();
                 return 0;
             }

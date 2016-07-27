@@ -90,6 +90,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     private boolean isStartByMe = false;
 
     public ServiceProxy() {
+        mServiceHandler = new ServiceHandler(ServiceProxy.this);
     }
 
     public LinkedBlockingQueue<String> getBlockingQueue() {
@@ -110,7 +111,6 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
     private void initListener(Context context) {
-        mServiceHandler = new ServiceHandler(ServiceProxy.this);
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.registerHandler(mServiceHandler,
                 EVENT_NETWORK_STATE_CHANGED);
@@ -247,7 +247,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     public void connect() {
         if (!isConnected()) {
-            String pushUrl = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL);
+            String pushUrl = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL, false);
             connection.connect(pushUrl);
         }
     }
@@ -259,11 +259,11 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     public void startBindClient() {
         BindRequest request = new BindRequest();
 
-        String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type);
-        request.setUserid(SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_USER_ID, Constant.userid));
+        String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type, false);
+        request.setUserid(SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_USER_ID, Constant.userid, false));
         request.setApptype(appType);
         request.setDeviceid(DeviceUtil.getUniqueId(mContext));
-        Constant.secret_key = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key);
+        Constant.secret_key = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key, false);
 
         request.setSign(request.getSign());
         sendRequest(request, true/*, true*/);
@@ -285,7 +285,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private void startReBindClient() {
         LogUtil.d(TAG, "startReBindClient()");
-        int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RESEND_COUNT, Constant.DEFAULT_RESEND_COUNT);
+        int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RESEND_COUNT, Constant.DEFAULT_RESEND_COUNT, false);
         if (reBindCount >= count) {
             return;
         }
@@ -304,7 +304,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
             LogUtil.d(TAG, "重新绑定打印机次数 " + reBindCount);
             startBindClient();
             int count = SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_RECONNECT_COUNT,
-                    Constant.DEFAULT_RECONNECT_COUNT);
+                    Constant.DEFAULT_RECONNECT_COUNT, false);
             if (reBindCount >= count) {
                 return 0;
             }
@@ -319,7 +319,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     public long getReconnectInterval() {
         return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_MSG_RESENT_INTERVAL,
-                Constant.DEFAULT_RECONNECT_INTERVAL);
+                Constant.DEFAULT_RECONNECT_INTERVAL, false);
     }
 
     /**
@@ -338,7 +338,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         Http http;
         try {
             RequestParam param = new RequestParam();
-            param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT));
+            param.setTimeout(SPUtil.getInstance(mContext).getInt(Constant.SPKey.KEY_MSG_TIMEOUT, Constant.DEFAULT_TIMEOUT, false));
             param.setTimeHandler(timeoutHandler);
             SocketRequest socketRequest = new SocketRequest(param, tcpMessage);
             socketRequest.setNeedRsp(isNeedResponse);
@@ -421,7 +421,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      */
     private long getHeartBeatInterval() {
         return SPUtil.getInstance(mContext).getLong(Constant.SPKey.KEY_HEARTBEAT_INTERVAL,
-                Constant.DEFAULT_HEARTBEAT_INTERVAL);
+                Constant.DEFAULT_HEARTBEAT_INTERVAL, false);
     }
 
     /**
@@ -438,7 +438,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * 设置心跳时间间隔
      */
     public void setHeartbeatInterval(long value) {
-        SPUtil.getInstance(mContext).save(Constant.SPKey.KEY_HEARTBEAT_INTERVAL, value);
+        SPUtil.getInstance(mContext).save(Constant.SPKey.KEY_HEARTBEAT_INTERVAL, value, false);
     }
 
 
@@ -450,8 +450,8 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
         try {
             // 构造心跳请求
             HeartbeatRequest heartbeatRequest = new HeartbeatRequest();
-            String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type);
-            String secretKey = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key);
+            String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type, false);
+            String secretKey = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key, false);
             heartbeatRequest.setApptype(appType);
             Constant.secret_key = secretKey;
             heartbeatRequest.setSign(heartbeatRequest.getSign());
@@ -701,14 +701,14 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
      * @throws JSONException
      */
     private void sendPushResponse(JSONObject object) throws JSONException {
-        PushResponse response = new PushResponse();
-        response.setMsgid(object.getString("msg_id"));
-        String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type);
-        String secretKey = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key);
-        response.setApptype(appType);
-        Constant.secret_key = secretKey;
-        response.setSign(response.getSign());
-        sendMessage(gson.toJson(response));
+            PushResponse response = new PushResponse();
+            response.setMsgid(object.getString("msg_id"));
+            String appType = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_APP_TYPE, Constant.app_type, false);
+            String secretKey = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_SECRET_KEY, Constant.secret_key, false);
+            response.setApptype(appType);
+            Constant.secret_key = secretKey;
+            response.setSign(response.getSign());
+            sendMessage(gson.toJson(response));
     }
 
     /**

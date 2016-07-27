@@ -134,8 +134,8 @@ public class PrinterConnection {
             LogUtil.d(TAG, "the mGpService is null !");
             return;
         }
-        String ip = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PRINT_IP, Constant.DEFAULT_PRINT_IP);
-        String port = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PRINT_PORT, Constant.DEFAULT_PRINT_PORT);
+        String ip = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PRINT_IP, Constant.DEFAULT_PRINT_IP, false);
+        String port = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PRINT_PORT, Constant.DEFAULT_PRINT_PORT, false);
         setPrintParameters(ip, port);
 
         if (!checkPortParameters(mPortParam)) {
@@ -271,10 +271,12 @@ public class PrinterConnection {
                      * 连接失败
                      */
                     ServiceProxy.ServiceHandler handler = ServiceProxy.getInstance().getServiceHandler();
-                    handler.removeMessages(ServiceProxy.MSG_PRINT_TEXT);
-                    if (!handler.hasMessages(ServiceProxy.MSG_PRINTER_CONNECT_FAILED)) {
-                        Message msg = handler.obtainMessage(ServiceProxy.MSG_PRINTER_CONNECT_FAILED);
-                        handler.sendMessageDelayed(msg, 2000L);
+                    if (handler != null) {
+                        handler.removeMessages(ServiceProxy.MSG_PRINT_TEXT);
+                        if (!handler.hasMessages(ServiceProxy.MSG_PRINTER_CONNECT_FAILED)) {
+                            Message msg = handler.obtainMessage(ServiceProxy.MSG_PRINTER_CONNECT_FAILED);
+                            handler.sendMessageDelayed(msg, 2000L);
+                        }
                     }
 
                     break;
@@ -284,17 +286,22 @@ public class PrinterConnection {
                     LogUtil.e(TAG, "连接打印机成功！");
                     ServiceProxy serviceProxy = ServiceProxy.getInstance();
                     ServiceProxy.ServiceHandler serviceHandler = serviceProxy.getServiceHandler();
-
-                    serviceHandler.removeMessages(ServiceProxy.MSG_PRINTER_CONNECT_FAILED);
-                    if (!serviceHandler.hasMessages(ServiceProxy.MSG_PRINT_TEXT)) {
-                        Message msg = serviceHandler.obtainMessage(ServiceProxy.MSG_PRINT_TEXT);
-                        serviceHandler.sendMessageDelayed(msg, 3000L);
+                    if (serviceHandler != null) {
+                        serviceHandler.removeMessages(ServiceProxy.MSG_PRINTER_CONNECT_FAILED);
+                        if (!serviceHandler.hasMessages(ServiceProxy.MSG_PRINT_TEXT)) {
+                            Message msg = serviceHandler.obtainMessage(ServiceProxy.MSG_PRINT_TEXT);
+                            serviceHandler.sendMessageDelayed(msg, 3000L);
+                        }
                     }
                     break;
                 case GpDevice.STATE_INVALID_PRINTER:
                 default:
                     LogUtil.e(TAG, "Please use Gprinter!");
-                    ServiceProxy.getInstance().getServiceHandler().removeMessages(ServiceProxy.MSG_PRINT_TEXT);
+
+                    ServiceProxy.ServiceHandler sHandler = ServiceProxy.getInstance().getServiceHandler();
+                    if (sHandler != null) {
+                        sHandler.removeMessages(ServiceProxy.MSG_PRINT_TEXT);
+                    }
                     break;
             }
         }
@@ -302,6 +309,7 @@ public class PrinterConnection {
 
     /**
      * 打印数据
+     *
      * @param text base64
      * @return true or false
      * @throws RemoteException
