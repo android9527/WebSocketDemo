@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
@@ -27,8 +28,16 @@ android {
 
     signingConfigs {
         release {
+            keyAlias 'key'
+            keyPassword '123456'
+            storeFile file('test.jks')
+            storePassword '123456'
         }
         debug {
+            keyAlias 'key'
+            keyPassword '123456'
+            storeFile file('test.jks')
+            storePassword '123456'
         }
     }
 
