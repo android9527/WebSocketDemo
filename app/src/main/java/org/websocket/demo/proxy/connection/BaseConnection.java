@@ -11,6 +11,7 @@ import org.websocket.demo.scheduletask.ScheduleTaskService;
 import org.websocket.demo.util.Constant;
 import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.util.SPUtil;
+import org.websocket.demo.util.TelephonyUtils;
 
 import java.util.ArrayList;
 
@@ -64,16 +65,23 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
 
     @Override
     public void connect(String url) {
-        if (connecting) {
-            LogUtil.w(TAG, "TCP is connecting return !");
-            return;
+        if (TelephonyUtils.isWifiAvailable(mContext)) {
+            needReConnect = true;
+            if (connecting) {
+                LogUtil.w(TAG, "TCP is connecting return !");
+                return;
+            }
+            if (isConnected()) {
+                LogUtil.w(TAG, "TCP is connected !");
+                return;
+            }
+            realConnect(url);
+        } else {
+            // 断开不重连
+            LogUtil.d(TAG, "wifi 不可用，断开连接");
+            stopReConnect();
+            disConnect(false);
         }
-
-        if (isConnected()) {
-            LogUtil.w(TAG, "TCP is connected !");
-            return;
-        }
-        realConnect(url);
     }
 
     @Override
@@ -165,6 +173,8 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
         else if (this.needReConnect) {
             String address = SPUtil.getInstance(mContext).getString(Constant.SPKey.KEY_PUSH_URL, Constant.URL);
             reConnect(address);
+        } else if (!needReConnect) {
+            stopReConnect();
         }
 
     }

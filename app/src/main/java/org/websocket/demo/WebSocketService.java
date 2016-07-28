@@ -112,6 +112,8 @@ public class WebSocketService extends Service {
         startService(new Intent(WebSocketService.this, WebSocketService.class));
     }
 
+
+    boolean needConnect = true;
     /**
      * 方法描述： 输入参数：@param intent 输入参数：@param flags
      * 输入参数：@param startId 输入参数：@return 返回类型：
@@ -128,6 +130,32 @@ public class WebSocketService extends Service {
         } else {
             LogUtil.d(TAG, "onStartCommand service restart by System");
         }
+//        Bundle bundle = null;
+//        String packageName = "";
+//        if (intent != null) {
+//            bundle = intent.getExtras();
+//            if(bundle != null){
+//                packageName = bundle.getString("package");
+//                LogUtil.w(TAG, "这是由 " + packageName + " 启动的service");
+//            }
+//        }
+//
+//        if (!TextUtils.isEmpty(packageName) && !packageName.equals(getPackageName())) {
+//            serviceProxy.connect();
+//        }else {
+//            ActivityManager.RunningServiceInfo serviceInfo = Helper.isServiceRunning(getApplicationContext(), WebSocketService.class.getName());
+//            if (null == serviceInfo) {
+//                serviceProxy.connect();
+//            } else {
+//                Intent startIntent = new Intent();
+//                startIntent.setPackage(serviceInfo.service.getPackageName());
+//                startIntent.setClassName(serviceInfo.service.getPackageName(), serviceInfo.service.getClassName());
+//                if (bundle != null) {
+//                    startIntent.putExtras(bundle);
+//                }
+//                startService(startIntent);
+//            }
+//        }
         serviceProxy.connect();
         return START_REDELIVER_INTENT;
     }

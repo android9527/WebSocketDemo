@@ -19,6 +19,7 @@ import org.websocket.demo.proxy.connection.IConnection;
 import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
 import org.websocket.demo.proxy.connection.PrinterConnection;
 import org.websocket.demo.util.Constant;
+import org.websocket.demo.util.Helper;
 import org.websocket.demo.util.SPUtil;
 
 /**
@@ -77,8 +78,11 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
 //        ServiceProxy.getInstance().init(this);
 //        DeviceUtil.setWifiNeverSleep(this.getApplicationContext());
         intent = new Intent(ChatClientActivity.this, WebSocketService.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("package", getPackageName());
+        intent.putExtras(bundle);
         startService(intent);
-
+//        Helper.isServiceRunning(ChatClientActivity.this, WebSocketService.class.getName());
         btnConnect = (Button) findViewById(R.id.btnConnect);
         btnClose = (Button) findViewById(R.id.btnClose);
         btnBind = (Button) findViewById(R.id.btnBind);
