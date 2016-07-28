@@ -47,7 +47,7 @@ android {
             if (variant.buildType.name.equals('release')) {
                 def releaseApkName = 'diancan_' + defaultConfig.versionName + '_release_' + '.apk'
                 output.outputFile = new File(oldFile.parent, releaseApkName)
-            }else if (variant.buildType.name.equals('debug')) {
+            } else if (variant.buildType.name.equals('debug')) {
                 def debugApkName = 'diancan_' + defaultConfig.versionName + '_debug_' + '.apk'
                 output.outputFile = new File(oldFile.parent, debugApkName)
             }
