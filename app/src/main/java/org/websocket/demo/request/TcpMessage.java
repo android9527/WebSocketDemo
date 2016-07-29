@@ -1,10 +1,7 @@
 package org.websocket.demo.request;
 
 import android.text.TextUtils;
-
 import com.google.gson.Gson;
-
-import org.websocket.demo.request.BaseRequest;
 
 public class TcpMessage
 {

@@ -1,16 +1,10 @@
 package org.websocket.demo.request;
 
-import java.util.HashMap;
-
-import android.annotation.SuppressLint;
-
-import org.websocket.demo.util.LogUtil;
 import org.websocket.demo.WebSocketService;
 import org.websocket.demo.util.Constant;
+import org.websocket.demo.util.LogUtil;
 
 public class TimeoutHandler implements ITimerHandler {
-    @SuppressLint("UseSparseArrays")
-    static HashMap<Short, String> requestMap = new HashMap<>();
 
     @Override
     public void timeoutHandle(String sequenceNumber, int status) {

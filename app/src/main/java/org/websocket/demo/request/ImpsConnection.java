@@ -1,7 +1,5 @@
 package org.websocket.demo.request;
 
-import org.websocket.demo.request.TcpMessage;
-
 public interface ImpsConnection {
     void receiveMsg(TcpMessage msg);
 
