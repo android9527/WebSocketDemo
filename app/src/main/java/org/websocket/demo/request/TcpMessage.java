@@ -1,4 +1,4 @@
-package org.websocket.demo.proxy;
+package org.websocket.demo.request;
 
 import android.text.TextUtils;
 

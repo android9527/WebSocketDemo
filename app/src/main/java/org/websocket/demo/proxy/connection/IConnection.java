@@ -1,6 +1,6 @@
 package org.websocket.demo.proxy.connection;
 
-import org.websocket.demo.proxy.ImpsConnection;
+import org.websocket.demo.request.ImpsConnection;
 
 /**
  * Created by chenfeiyue on 16/7/20.

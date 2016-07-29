@@ -1,4 +1,4 @@
-package org.websocket.demo.proxy;
+package org.websocket.demo.request;
 
 /**
  * 类名称：Request 类描述：请求对象 修改时间：

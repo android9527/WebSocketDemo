@@ -12,14 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import org.websocket.demo.proxy.BaseHandler;
-import org.websocket.demo.proxy.ImpsConnection;
-import org.websocket.demo.proxy.ServiceProxy;
-import org.websocket.demo.proxy.TcpMessage;
+import org.websocket.demo.request.ImpsConnection;
+import org.websocket.demo.request.TcpMessage;
 import org.websocket.demo.proxy.connection.IConnection;
-import org.websocket.demo.proxy.connection.OkHttpWebSocketConnection;
 import org.websocket.demo.proxy.connection.PrinterConnection;
 import org.websocket.demo.util.Constant;
-import org.websocket.demo.util.Helper;
 import org.websocket.demo.util.SPUtil;
 
 /**

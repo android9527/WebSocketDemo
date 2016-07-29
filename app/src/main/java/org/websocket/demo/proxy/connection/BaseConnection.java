@@ -3,8 +3,8 @@ package org.websocket.demo.proxy.connection;
 import android.content.Context;
 import android.text.TextUtils;
 
-import org.websocket.demo.proxy.ImpsConnection;
-import org.websocket.demo.proxy.TcpMessage;
+import org.websocket.demo.request.ImpsConnection;
+import org.websocket.demo.request.TcpMessage;
 import org.websocket.demo.proxy.TcpMessageParser;
 import org.websocket.demo.scheduletask.ScheduleTask;
 import org.websocket.demo.scheduletask.ScheduleTaskService;

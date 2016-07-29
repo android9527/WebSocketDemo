@@ -7,9 +7,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 
-import org.websocket.demo.proxy.Http;
+import org.websocket.demo.request.Http;
 import org.websocket.demo.proxy.ServiceProxy;
-import org.websocket.demo.proxy.SocketRequest;
+import org.websocket.demo.request.SocketRequest;
 import org.websocket.demo.util.LogUtil;
 
 

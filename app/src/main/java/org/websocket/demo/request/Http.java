@@ -1,4 +1,4 @@
-package org.websocket.demo.proxy;
+package org.websocket.demo.request;
 
 import org.websocket.demo.util.AsyncTaskExecutors;
 import org.websocket.demo.WebSocketService;

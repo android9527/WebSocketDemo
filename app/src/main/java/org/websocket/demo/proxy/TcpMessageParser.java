@@ -1,6 +1,8 @@
 package org.websocket.demo.proxy;
 
 import org.json.JSONObject;
+import org.websocket.demo.request.SocketRequest;
+import org.websocket.demo.request.TcpMessage;
 
 public class TcpMessageParser {
 
