@@ -113,8 +113,6 @@ public class WebSocketService extends Service {
     }
 
 
-    boolean needConnect = true;
-
     /**
      * 方法描述： 输入参数：@param intent 输入参数：@param flags
      * 输入参数：@param startId 输入参数：@return 返回类型：
