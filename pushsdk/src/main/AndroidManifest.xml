@@ -1,4 +1,4 @@
-<manifest package="demo.statsdk.qfpay.com.pushsdk"
+<manifest package="com.qfpay.pushsdk"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application android:allowBackup="true"
@@ -8,5 +8,23 @@
                  android:theme="@style/AppTheme">
 
     </application>
+    <!-- 网络权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+
+    <receiver android:name="com.qfpay.pushsdk.PushReceiver">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+        </intent-filter>
+    </receiver>
+
+
 
 </manifest>

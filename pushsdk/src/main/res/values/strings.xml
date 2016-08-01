@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">PushSdk</string>
+    <string name="app_name">点餐打印</string>
+    <string name="app_type">601</string>
+    <string name="secret_key">123456</string>
 </resources>

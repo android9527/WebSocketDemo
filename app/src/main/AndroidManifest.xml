@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="com.qfpay.push"
+    package="com.qfpay.pushsdk.demo"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 网络权限 -->
@@ -16,13 +16,13 @@
     <!--<permission android:name="com.qfpay.permission.PUSHCORE"/>-->
     <!--<uses-permission android:name="com.qfpay.permission.PUSHCORE"/>-->
     <application
-        android:name="com.qfpay.push.MyApplication"
+        android:name="com.qfpay.pushsdk.demo.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.qfpay.push.ChatClientActivity"
+            android:name="com.qfpay.pushsdk.demo.ChatClientActivity"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -31,11 +31,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.qfpay.push.SettingActivity"
+        <activity android:name="com.qfpay.pushsdk.demo.SettingActivity"
             />
 
         <service
-            android:name="com.qfpay.push.WebSocketService"
+            android:name="com.qfpay.pushsdk.WebSocketService"
             android:exported="true"
             android:process=":remote"
             >
@@ -58,7 +58,7 @@
         </service>
 
         <service
-            android:name="com.qfpay.push.WebSocketService$DaemonInnerService"
+            android:name="com.qfpay.pushsdk.WebSocketService$DaemonInnerService"
             android:exported="true"
             android:process=":remote"
             >

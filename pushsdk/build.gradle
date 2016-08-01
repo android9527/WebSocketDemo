@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
@@ -6,55 +6,16 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "com.qfpay.push"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 2
         versionName "1.0.2"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            debuggable true
-            signingConfig signingConfigs.debug
-        }
-        debug {
-            signingConfig signingConfigs.debug
-        }
-    }
 
     lintOptions {
         abortOnError false
     }
-    signingConfigs {
-        release {
-            keyAlias 'key'
-            keyPassword '123456'
-            storeFile file('test.jks')
-            storePassword '123456'
-        }
-        debug {
-            keyAlias 'key'
-            keyPassword '123456'
-            storeFile file('test.jks')
-            storePassword '123456'
-        }
-    }
 
-    //修改生成的apk名字
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def oldFile = output.outputFile
-            if (variant.buildType.name.equals('release')) {
-                def releaseApkName = 'diancan_' + defaultConfig.versionName + '_release_' + '.apk'
-                output.outputFile = new File(oldFile.parent, releaseApkName)
-            } else if (variant.buildType.name.equals('debug')) {
-                def debugApkName = 'diancan_' + defaultConfig.versionName + '_debug_' + '.apk'
-                output.outputFile = new File(oldFile.parent, debugApkName)
-            }
-        }
-    }
 }
 
 dependencies {
