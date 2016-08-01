@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="org.websocket.demo"
+    package="com.qfpay.push"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 网络权限 -->
@@ -16,13 +16,13 @@
     <!--<permission android:name="com.qfpay.permission.PUSHCORE"/>-->
     <!--<uses-permission android:name="com.qfpay.permission.PUSHCORE"/>-->
     <application
-        android:name="org.websocket.demo.MyApplication"
+        android:name="com.qfpay.push.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name="org.websocket.demo.ChatClientActivity"
+            android:name="com.qfpay.push.ChatClientActivity"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -31,11 +31,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="org.websocket.demo.SettingActivity"
+        <activity android:name="com.qfpay.push.SettingActivity"
             />
 
         <service
-            android:name="org.websocket.demo.WebSocketService"
+            android:name="com.qfpay.push.WebSocketService"
             android:exported="true"
             android:process=":remote"
             >
@@ -58,7 +58,7 @@
         </service>
 
         <service
-            android:name="org.websocket.demo.WebSocketService$DaemonInnerService"
+            android:name="com.qfpay.push.WebSocketService$DaemonInnerService"
             android:exported="true"
             android:process=":remote"
             >
@@ -66,7 +66,10 @@
 
         <meta-data
             android:name="app_type"
-            android:value="601" />
+            android:value="@string/app_type" />
+        <meta-data
+            android:name="secret_key"
+            android:value="@string/secret_key" />
     </application>
 
 </manifest>
