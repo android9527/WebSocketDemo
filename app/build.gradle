@@ -75,5 +75,5 @@ dependencies {
 
 //    compile 'com.coolerfall:android-app-daemon:1.2.0'
 
-//    compile project(':pushsdk')
+    compile project(':pushsdk')
 }
