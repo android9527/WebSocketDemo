@@ -6,7 +6,7 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "org.websocket.demo"
+        applicationId "com.qfpay.push"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 2
@@ -24,7 +24,9 @@ android {
         }
     }
 
-
+    lintOptions {
+        abortOnError false
+    }
     signingConfigs {
         release {
             keyAlias 'key'
@@ -70,3 +72,10 @@ dependencies {
 
 //    compile 'com.coolerfall:android-app-daemon:1.2.0'
 }
+
+//编译 打包 发布混淆版本的jar包
+task aaa_buildPushSdkJar(type: Exec) {
+    commandLine './packagejar.sh', 'pushsdk_v' + android.defaultConfig.versionName + '.jar', 'libs/pushsdk_v' + android.defaultConfig.versionName + '.jar'
+}
+
+aaa_buildPushSdkJar {}.dependsOn 'build'
