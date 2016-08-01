@@ -79,7 +79,6 @@ public class OkHttp3Creator {
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
                     .sslSocketFactory(socketFactory)
                     .hostnameVerifier(HOSTNAME_VERIFIER);
-//                    .cache(new Cache(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Picasso_cache"), 5 * 1024 * 1024));
 
             HttpLoggingInterceptor.Level level = /*ConstValue.DEBUG_MODE ? HttpLoggingInterceptor.Level.HEADERS : */HttpLoggingInterceptor.Level.BODY;
 

@@ -244,6 +244,19 @@ public class DeviceUtil {
                     PackageManager.GET_META_DATA).metaData.getString("app_type");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+            appType = Constant.app_type;
+        }
+        return appType;
+    }
+
+    public static String getSecretKey(Context context) {
+        String appType = "";
+        try {
+            appType = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+                    PackageManager.GET_META_DATA).metaData.getString("secret_key");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            appType = Constant.secret_key;
         }
         return appType;
     }
