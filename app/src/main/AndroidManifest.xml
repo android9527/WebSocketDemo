@@ -63,6 +63,10 @@
             android:process=":remote"
             >
         </service>
+
+        <meta-data
+            android:name="app_type"
+            android:value="601" />
     </application>
 
 </manifest>

@@ -208,19 +208,19 @@ public class DeviceUtil {
     public static void setWifiNeverSleep(Context mContext) {
         ContentResolver resolver = mContext.getContentResolver();
 //        if (Build.VERSION.SDK_INT < 17) {
-            int wifiSleepPolicy = Settings.System.getInt(resolver,
-                    android.provider.Settings.System.WIFI_SLEEP_POLICY,
-                    Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
-            System.out.println("---> 修改前的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
+        int wifiSleepPolicy = Settings.System.getInt(resolver,
+                android.provider.Settings.System.WIFI_SLEEP_POLICY,
+                Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
+        System.out.println("---> 修改前的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
 
-            Settings.System.putInt(resolver,
-                    android.provider.Settings.System.WIFI_SLEEP_POLICY,
-                    Settings.System.WIFI_SLEEP_POLICY_NEVER);
+        Settings.System.putInt(resolver,
+                android.provider.Settings.System.WIFI_SLEEP_POLICY,
+                Settings.System.WIFI_SLEEP_POLICY_NEVER);
 
-            wifiSleepPolicy = Settings.System.getInt(resolver,
-                    android.provider.Settings.System.WIFI_SLEEP_POLICY,
-                    Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
-            System.out.println("---> 修改后的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
+        wifiSleepPolicy = Settings.System.getInt(resolver,
+                android.provider.Settings.System.WIFI_SLEEP_POLICY,
+                Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
+        System.out.println("---> 修改后的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
 //        } else {
 //            int wifiSleepPolicy = Settings.System.getInt(resolver,
 //                    android.provider.Settings.Global.WIFI_SLEEP_POLICY,
@@ -235,6 +235,17 @@ public class DeviceUtil {
 //            System.out.println("---> 17+修改后的Wifi休眠策略值 WIFI_SLEEP_POLICY=" + wifiSleepPolicy);
 //        }
 
+    }
+
+    public static String getAppType(Context context) {
+        String appType = "";
+        try {
+            appType = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+                    PackageManager.GET_META_DATA).metaData.getString("app_type");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return appType;
     }
 
 }
