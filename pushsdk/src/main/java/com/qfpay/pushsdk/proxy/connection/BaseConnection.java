@@ -211,7 +211,7 @@ public abstract class BaseConnection implements IConnection, ScheduleTask.Callba
             for (ImpsConnection impsConnection : impsConnections) {
                 if (null == impsConnection)
                     continue;
-                impsConnection.sendedMessage(message);
+                impsConnection.sentMessage(message);
             }
         }
     }

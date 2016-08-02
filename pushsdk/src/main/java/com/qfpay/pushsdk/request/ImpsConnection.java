@@ -7,5 +7,5 @@ public interface ImpsConnection {
 
     void connectedNotify(boolean status, boolean needReConnect);
 
-    void sendedMessage(String msg);
+    void sentMessage(String msg);
 }

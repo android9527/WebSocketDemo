@@ -232,7 +232,7 @@ public class ServiceProxy implements ScheduleTask.Callback, ImpsConnection {
     }
 
     @Override
-    public void sendedMessage(String msg) {
+    public void sentMessage(String msg) {
 
     }
 

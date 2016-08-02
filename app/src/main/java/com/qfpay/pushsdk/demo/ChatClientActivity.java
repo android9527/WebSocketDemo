@@ -191,7 +191,7 @@ public class ChatClientActivity extends AppCompatActivity implements OnClickList
     }
 
     @Override
-    public void sendedMessage(String msg) {
+    public void sentMessage(String msg) {
         Message message = handler.obtainMessage(MESSAGE_SEND);
         message.obj = msg;
         handler.sendMessage(message);
