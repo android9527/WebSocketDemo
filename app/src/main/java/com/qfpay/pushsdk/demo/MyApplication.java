@@ -1,6 +1,7 @@
 package com.qfpay.pushsdk.demo;
 
 import android.app.Application;
+import android.content.Intent;
 //import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -12,5 +13,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 //        LeakCanary.install(MyApplication.this);
+        Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }

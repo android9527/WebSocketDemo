@@ -31,8 +31,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.qfpay.pushsdk.demo.SettingActivity"
-            />
+        <!--<activity android:name="com.qfpay.pushsdk.demo.SettingActivity"-->
+            <!--/>-->
 
         <service
             android:name="com.qfpay.pushsdk.WebSocketService"

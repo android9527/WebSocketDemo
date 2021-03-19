@@ -2,6 +2,7 @@ package com.qfpay.pushsdk.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -19,6 +20,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("SettingActivity", "onCreate");
         setContentView(R.layout.activity_setting);
         etUserId = (EditText) findViewById(R.id.et_user_id);
         etPushUrl = (EditText) findViewById(R.id.et_push_url);
